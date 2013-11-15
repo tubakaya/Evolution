@@ -1,0 +1,45 @@
+module Main
+
+import lang::java::m3::Core;
+import lang::java::jdt::m3::Core;
+import List;
+import Exception;
+import ParseTree;
+import IO;
+import util::FileSystem;
+import lang::java::\syntax::Disambiguate;
+import lang::java::\syntax::Java15;
+
+import CyclomaticComplexity;
+
+
+public void main() {
+  myModel = createM3FromEclipseProject(|project://HelloWorld|);			
+  println("this is my model: <myModel>");
+  
+  lrel[int cc, loc method] result = findComplexFiles(|project://HelloWorld|);
+  println("this is my result: <result>");
+}
+
+loc getProject() {
+		  return |project://HelloWorld|;
+}
+
+list[loc] getFiles(loc project) {
+  result = [f | /file(f) <- crawl(project), f.extension == "java"];
+  return result;	
+}
+
+
+lrel[int cc, loc method] findComplexFiles(loc project) {
+  result = [*maxCC(f) | /file(f) <- crawl(project), f.extension == "java"];	
+  result = sort(result, bool (<int a, loc _>, <int b, loc _>) { return a < b; });
+  // return head(reverse(result), limit);
+  return result;
+}
+
+set[MethodDec] allMethods(loc file) 
+  = {m | /MethodDec m := parse(#start[CompilationUnit], file)};
+
+lrel[int cc, loc method] maxCC(loc file) 
+  = [<cyclomaticComplexity(m), m@\loc> | m <- allMethods(file)];
