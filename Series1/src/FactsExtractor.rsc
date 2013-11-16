@@ -32,14 +32,13 @@ public int ExtractDuplicateCount(loc project, str ext)
 
 	list[loc] allFiles = GetAllFiles(project, ext);
 	
-	list[loc] visitedFiles = [];
-	for(f <- allFiles)
+	map[loc, list[str]] fileCodeLines = (f:GetCodeLines(f) | f <- allFiles);
+	map[loc, list[str]] compareList = fileCodeLines;
+	for((f:lines1) <- fileCodeLines)
 	{
-		visitedFiles +=f;
-		list[str] lines1 = readFileLines(f);
-		for( f2 <- (allFiles - visitedFiles))
+		compareList = delete(compareList, f);
+		for( (f2:lines2) <- compareList)
 		{
-			list[str] lines2 = readFileLines(f2);
 			rel[str,str] equalLines = {<l1,l2> | l1 <- lines1, l2 <- lines2, l1 == l2};
 			
 			/*check the 6 lines starting with l1*/
