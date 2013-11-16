@@ -104,6 +104,19 @@
     "javaRuntime": true
   },
   {
+    "symbolicName": "org.yaml.snakeyaml",
+    "version": {
+      "major": 1,
+      "minor": 11,
+      "micro": 0,
+      "qualifier": ""
+    },
+    "jarFileFingerprint": "8f33a218f0bcad15223dd8c3af31f1b65c80c7a7",
+    "jarFileModificationDate": "2013-11-15T19:26:03.716+01:00",
+    "location": "D:\\Git\\Evolution\\Series1Sander\\.metadata\\.plugins\\org.eclipse.pde.core\\.external_libraries\\rascal_0.6.2.201311142244\\lib\\snakeyaml-1.11.jar",
+    "javaRuntime": false
+  },
+  {
     "symbolicName": "jre",
     "version": {
       "major": 1,
@@ -218,6 +231,18 @@
     "jarFileFingerprint": "8f33a218f0bcad15223dd8c3af31f1b65c80c7a7",
     "jarFileModificationDate": "2013-11-15T19:26:03.716+01:00",
     "location": "D:\\UvA\\Software Evolution\\series1\\.metadata\\.plugins\\org.eclipse.pde.core\\.external_libraries\\rascal_0.6.2.201311142244\\lib\\snakeyaml-1.11.jar",
+    "javaRuntime": false
+  },
+  {
+    "symbolicName": "test",
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "micro": 0,
+      "qualifier": ""
+    },
+    "jarFileModificationDate": "2013-11-15T22:04:59.167+01:00",
+    "location": "D:\\Git\\Evolution\\Series1Sander\\test\\src",
     "javaRuntime": false
   },
   {

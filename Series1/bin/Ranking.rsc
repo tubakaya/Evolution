@@ -1,3 +1,8 @@
 module Ranking
 
-/*data Rank = VeryLow|Low|Moderate|High|VeryHigh;*/
+
+data Rank = VeryLow(num size)
+|Low(num size)
+|Moderate(num size)
+|High(num size)
+|VeryHigh(num size);

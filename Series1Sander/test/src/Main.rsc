@@ -46,8 +46,12 @@ public void main() {
   //NOTE: currently take the first (0) file  
   methods2 = getMethods(files2[0]);
   println("methods2: <methods2>");
+  methods3 = getMethods(files2[1]);
+  println("methods3: <methods3>");
   
-  rel2 = [<cyclomaticComplexity(m), m@\loc> | m <- methods2];
+  methods4 = methods2 + methods3;
+  
+  rel2 = [<cyclomaticComplexity(m), m@\loc> | m <- methods4];
   println("rel2: <rel2>");
   
 }

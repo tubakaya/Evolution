@@ -94,3 +94,7 @@ java.lang.IllegalStateException: value is absent
 	at org.eclipse.recommenders.internal.rcp.providers.ClasspathEntryInfoProvider.access$1(ClasspathEntryInfoProvider.java:128) [org.eclipse.recommenders.rcp_1.0.5.v20130822-0858-b90.jar:na]
 	at org.eclipse.recommenders.internal.rcp.providers.ClasspathEntryInfoProvider$1.run(ClasspathEntryInfoProvider.java:105) [org.eclipse.recommenders.rcp_1.0.5.v20130822-0858-b90.jar:na]
 	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:53) [org.eclipse.core.jobs_3.5.300.v20130429-1813.jar:na]
+2013-11-16 19:22:54,394 [main] INFO  c.n.h.c.p.n.NettyAsyncHttpProvider - Number of application's worked threads is 16
+2013-11-16 19:24:07,738 [pool-6-thread-1] INFO  c.n.h.c.p.n.NettyAsyncHttpProvider - Number of application's worked threads is 16
+2013-11-16 19:24:08,479 [pool-8-thread-1] INFO  c.n.h.c.p.n.NettyAsyncHttpProvider - Number of application's worked threads is 16
+2013-11-16 19:24:09,083 [pool-10-thread-1] INFO  c.n.h.c.p.n.NettyAsyncHttpProvider - Number of application's worked threads is 16

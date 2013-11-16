@@ -56,6 +56,35 @@ public Rank AnalyzeVolume(int LOC)
 	}*/
 }
 
+public Rank AnalyzeComplexity()
+{
+/*
+  parameter:
+  	map[loc method, tuple[int cc, int lines]]
+  	
+  todo:
+    for all methods (loc)
+      calculate it's risk evaluation based on:
+		CC		Risk evaluation
+		1-10	simple, without much risk
+		11-20	more complex, moderate risk
+		21-50	complex, high risk
+		> 50	untestable, very high risk
+		
+	  for each risk evaluation calculate the number of lines
+	  as percentage to LOC
+	  
+	  determine ranking based on:
+				maximum relative LOC
+		rank	moderate	high	very high
+		++		25%			0%		0%
+		+		30%			5%		0%
+		o		40%			10%		0%
+		-		50%			15%		5%
+		--		-			-		-	  
+*/
+}
+
 /*Find the percentage of dublicated code to the whole project.
 Ranking is so:
 0-3% VeryHigh

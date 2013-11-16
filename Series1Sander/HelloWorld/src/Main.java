@@ -2,11 +2,21 @@
 public class Main {
 
 	public static void main(String[] args) {
-		String msg1 = getMessage1();
-		System.out.println(msg1);
+		String msg;
+		
+		msg = getMessage1();
+		display(msg);
 
-		String msg2 = getMessage2();
-		System.out.println(msg2);
+		msg = getMessage2();
+		display(msg);
+		
+		Extra extra = new Extra();
+		display(extra.getText1(1));
+		display(extra.getText2(2));
+	}
+	
+	private static void display(String msg) {
+		System.out.println(msg);
 	}
 	
 	private static String getMessage1() {
