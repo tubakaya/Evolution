@@ -22,8 +22,8 @@ public int ExtractTotalLOC(loc project, str ext)
 public int ExtractTotalStatCount(loc project)
 {}
 
-/*Extract the amount of dublicate code of at least 6 lines*/
-public int ExtractDublicateCount(loc project, str ext)
+/*Extract the amount of duplicate code of at least 6 lines*/
+public int ExtractDuplicateCount(loc project, str ext)
 {
 	list[loc] allFiles = GetAllFiles(project, ext);
 	map[loc, list[loc]] fileLines = [(f:readFileLines(f))| f <- allFiles];
