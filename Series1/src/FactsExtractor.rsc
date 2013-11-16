@@ -9,9 +9,9 @@ import String;
 /* Extracts only code lines*/
 public int ExtractTotalLOC(loc project, str ext)
 {
-	list[loc] allFiles = GetAllFiles(project, ext);
+			list[loc] allFiles = GetAllFiles(project, ext);
 	allLines = [readFileLines(f) | loc f <- allFiles];
-	codeLines = [l |l <- allLines[0]
+		codeLines = [l | m <- allLines, l <- m
 					, !isEmpty(trim(l))
 					, !startsWith(trim(l),"/*")
 					, !endsWith(trim(l),"*/")];
