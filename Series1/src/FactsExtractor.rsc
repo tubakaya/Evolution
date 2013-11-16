@@ -2,17 +2,20 @@ module FactsExtractor
 import util::FileSystem;
 import List;
 import IO;
+import String;
 
 import lang::java::jdt::m3::Core;
 
-/* Right now extracting all the lines..
-It should extract only code lines!!*/
+/* Extracts only code lines*/
 public int ExtractTotalLOC(loc project, str ext)
 {
-							  list[loc] allFiles = [f | /file(f) <- crawl(project), f.extension == ext];	
-	  allLines = [readFileLines(f) | loc f <- allFiles];
-	  codeLines = [l |l<-allLines, size(l)>0];
-	  return (0 | it +1 | f <- codeLines);
+	list[loc] allFiles = [f | /file(f) <- crawl(project), f.extension == ext];	
+	allLines = [readFileLines(f) | loc f <- allFiles];
+	codeLines = [l |l <- allLines[0]
+					, !isEmpty(trim(l))
+					, !startsWith(trim(l),"/*")
+					, !endsWith(trim(l),"*/")];
+	return size(codeLines);	
 }
 
 /*Extract the total amount of Switch, If, For and While statements*/
