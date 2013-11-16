@@ -9,9 +9,9 @@ import String;
 /* Extracts only code lines*/
 public int ExtractTotalLOC(loc project, str ext)
 {
-			list[loc] allFiles = GetAllFiles(project, ext);
+	list[loc] allFiles = GetAllFiles(project, ext);
 	allLines = [readFileLines(f) | loc f <- allFiles];
-		codeLines = [l | m <- allLines, l <- m
+	codeLines = [l | m <- allLines, l <- m
 					, !isEmpty(trim(l))
 					, !startsWith(trim(l),"/*")
 					, !endsWith(trim(l),"*/")];
@@ -39,6 +39,7 @@ public int ExtractDuplicateCount(loc project, str ext)
 			list[loc] equalLines = [l1 | l1 <- lines1, l2 <- lines2, l1==l2];
 			
 			/*check the 6 lines starting with l1*/
+			
 		}
 	}
 	
