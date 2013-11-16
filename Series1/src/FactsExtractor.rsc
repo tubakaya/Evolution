@@ -7,7 +7,7 @@ import lang::java::jdt::m3::Core;
 
 /* Right now extracting all the lines..
 It should extract only code lines!!*/
-public int extractTotalLOC(loc project, str ext)
+public int ExtractTotalLOC(loc project, str ext)
 {
 							  list[loc] allFiles = [f | /file(f) <- crawl(project), f.extension == ext];	
 	  allLines = [readFileLines(f) | loc f <- allFiles];
@@ -15,6 +15,19 @@ public int extractTotalLOC(loc project, str ext)
 	  return (0 | it +1 | f <- codeLines);
 }
 
-/*If we really need to do this with M3, then fill this method
-public int extractTotalLOCM3(loc project, str ext)
-{}*/
+/*Extract the total amount of Switch, If, For and While statements*/
+public int ExtractTotalStatCount(loc project)
+{}
+
+/*Extract the amount of dublicate code of at least 6 lines*/
+public int ExtractDublicateCount(loc project, str ext)
+{
+	
+}
+
+public list[int] ExtractUnitSizes(loc project)
+{
+}
+
+public int ExtractAssertCount(loc project)
+{}
