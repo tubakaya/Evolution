@@ -2,16 +2,16 @@ module Main
 import MaintainabilityAnalyzer;
 import Ranking;
 
-public void Main()
+public map[str,Rank] Main()
 {
-loc project=|project://TestJ|;
-str projectType="java";
+	loc project=|project://TestJ|;
+	str projectType="java";
 
-map[str,Rank] result = AnalyzeMaintainability(project,projectType);
+	return AnalyzeMaintainability(project,projectType);
 
-/*print results
-for( (s:r) <- result)
-{
-	println("<s> rank is <r==VeryHigh?"VeryHigh">");
-}*/
+	/*change the return type to void and visualize results	
+	for( (s:r) <- result)
+	{
+		println("<s> rank is <r==VeryHigh?"VeryHigh">");
+	}*/
 }

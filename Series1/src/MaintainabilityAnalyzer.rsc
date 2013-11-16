@@ -17,5 +17,5 @@ public map[str, Rank] AnalyzeMaintainability(loc project, str projectType)
 Rank GetVolumeRank(loc project, str projectType)
 {
  int totalLOC = ExtractTotalLOC(project,projectType);
- return AnalyzeVolume(totalLOC, projectType);
+ return AnalyzeVolume(totalLOC);
 }

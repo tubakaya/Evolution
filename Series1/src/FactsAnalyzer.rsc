@@ -1,7 +1,15 @@
 module FactsAnalyzer
 import Ranking;
+import lang::java::\syntax::Java15;
 
-map[str,int] LOCRatio = ("java":66, "Cobol":131);
+
+/*It would be nicer if we had a map[Expr,Rank]
+map[int, Rank] JavaLocRank = 
+   ( 66  : VeryHigh
+	,246 : High
+	,665 : Moderate
+	,1310: Low);*/
+
 
 /*Volume ranking is calculated so:
 Function point per language is calculated and you can see this from LOCRatio above.
@@ -12,19 +20,40 @@ In Java language,
 246-665KLOC is ranked as Moderate,
 655-1,310KLOC is ranked as Low,
 >1,310KLOC is ranked as VeryLow */
-public Rank AnalyzeVolume(int LOC, str ext)
+public Rank AnalyzeVolume(int LOC)
 {
-	int ratio=[ LOCRatio[k] | k <- LOCRatio, k==ext ][0];
-	num kloc= LOC/1000;
+	num kloc = LOC/1000;
 	
-if(kloc<66)
-{
-return VeryHigh(kloc);
-}
+	return if(kloc<66)
+	{
+	 VeryHigh(kloc);
+	}
+	else if(kloc<246)
+	{
+	 High(kloc);
+	}
+	else if(kloc<665)
+	{
+	 Moderate(kloc);
+	}
+	else if(kloc<1310)
+	{
+	 Low(kloc);
+	}
 	else
 	{
-	return High(kloc);
+	 VeryLow(kloc);
 	}
+	
+	/*list[int] limits = [jr | jr <- JavaLocRank];
+	for( i<-limits)
+	{
+		if(kloc<i)
+		{
+			Rank rank = JavaLocRank[i];
+			return rank(kloc);
+		}
+	}*/
 }
 
 /*Find the percentage of dublicated code to the whole project.

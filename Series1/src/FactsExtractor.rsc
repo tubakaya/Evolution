@@ -1,10 +1,10 @@
 module FactsExtractor
+
+import lang::java::jdt::m3::Core;
 import util::FileSystem;
 import List;
 import IO;
 import String;
-
-import lang::java::jdt::m3::Core;
 
 /* Extracts only code lines*/
 public int ExtractTotalLOC(loc project, str ext)
