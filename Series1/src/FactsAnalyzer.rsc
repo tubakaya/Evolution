@@ -1,11 +1,5 @@
 module FactsAnalyzer
-
-
-data Rank = VeryLow(int size)
-|Low(int size)
-|Moderate(int size)
-|High(int size)
-|VeryHigh(int size);
+import Ranking;
 
 map[str,int] LOCRatio = ("java":66, "Cobol":131);
 
@@ -22,6 +16,15 @@ public Rank AnalyzeVolume(int LOC, str ext)
 {
 	int ratio=[ LOCRatio[k] | k <- LOCRatio, k==ext ][0];
 	num kloc= LOC/1000;
+	
+if(kloc<66)
+{
+return VeryHigh(kloc);
+}
+	else
+	{
+	return High(kloc);
+	}
 }
 
 /*Find the percentage of dublicated code to the whole project.
@@ -33,7 +36,6 @@ Ranking is so:
 20-100% Very Low*/
 public Rank AnalyzeDublication(int amountOfDublication)
 {
-
 }
 
 public Rank AnalyzeUnitSize()
