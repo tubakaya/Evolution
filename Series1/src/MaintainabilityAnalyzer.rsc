@@ -14,7 +14,9 @@ public map[str, Rank] AnalyzeMaintainability(loc project, str projectType)
   /*call analyze methods and add findings to the result*/
   map[str, Rank] result = (
 	 "Volume": GetVolumeRank(project,projectType),
-   	 "Complexity": GetComplexityRank(project, projectType)
+   	 "Complexity": GetComplexityRank(project, projectType),
+   	 "Duplication": GetDuplicationRank(project, projectType),
+   	 "Unit size": GetUnitSizeRank(project, projectType)
   );
     
   return result;
@@ -28,7 +30,20 @@ Rank GetVolumeRank(loc project, str projectType)
 
 Rank GetComplexityRank(loc project, str projectType)
 {
-  result = ExtractCC(project, projectType);
-  //println("result: <result>");
+  facts = ExtractComplexity(project, projectType);
+  println("facts: <facts>");
+  result = AnalyzeComplexity(facts);
+  return Moderate(0);
+}
+
+Rank GetDuplicationRank(loc project, str projectType)
+{
+  //TODO: implement
+  return Moderate(0);
+}
+
+Rank GetUnitSizeRank(loc project, str projectType)
+{
+  //TODO: implement
   return Moderate(0);
 }

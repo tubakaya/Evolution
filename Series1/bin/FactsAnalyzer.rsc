@@ -1,6 +1,9 @@
 module FactsAnalyzer
+
 import Ranking;
+
 import lang::java::\syntax::Java15;
+import IO;
 
 
 /*It would be nicer if we had a map[Expr,Rank]
@@ -56,7 +59,7 @@ public Rank AnalyzeVolume(int LOC)
 	}*/
 }
 
-public Rank AnalyzeComplexity()
+public Rank AnalyzeComplexity(list[tuple[loc method, int CC, int lines]] facts)
 {
 /*
   parameter:
@@ -83,6 +86,20 @@ public Rank AnalyzeComplexity()
 		-		50%			15%		5%
 		--		-			-		-	  
 */
+
+  // print facts
+  println("=== FACTS ===");
+  for(f <- facts) {
+    println("CC = <f.CC>, lines = <f.lines>");
+  }
+  println("=== FACTS ===");
+
+  // calculate total LOC
+  totalLOC = (0 | it + l | <m, C, l> <- facts);
+  println("totalLOC: <totalLOC>");
+
+
+	return Moderate(0);
 }
 
 /*Find the percentage of dublicated code to the whole project.
