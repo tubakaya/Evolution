@@ -126,20 +126,43 @@ public list[int] ExtractUnitSizes(loc project)
 }
 
 public int ExtractAssertCount(loc project)
-{}
+{
+}
 
 list[loc] GetAllFiles(loc project, str ext)
 {
 	return [f | /file(f) <- crawl(project), f.extension == ext];
 }
 
-list[str] GetCodeLines(loc file)
+list[str] GetCodeLines(loc location)
 {
-	list[str] allLines = readFileLines(file);
-	return [l | l <- allLines
-				, !isEmpty(trim(l))
-				, !startsWith(trim(l),"/*")
-				, !endsWith(trim(l),"*/")];
+	list[str] allLines = readFileLines(location);
+	list[str] codeLines = [];
+	
+	bool inCommentBlock = false;
+	for( l <- allLines)
+	{
+		str lt=trim(l);
+		if(startsWith(lt,"/*"))
+		{
+			inCommentBlock = true;
+			fail;
+		}
+		if(endsWith(lt,"*/"))
+		{
+			inCommentBlock = false;
+			fail;
+		}
+		if(isEmpty(lt))
+		{
+			fail;
+		}
+		else
+		{
+			inCommentBlock = false;
+			codeLines += l;
+		}
+	}
 }
 
 list[str] GetCodeLinesOfProject(loc project)
