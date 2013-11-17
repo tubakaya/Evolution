@@ -31,7 +31,7 @@ Rank GetVolumeRank(loc project, str projectType)
 Rank GetComplexityRank(loc project, str projectType)
 {
   facts = ExtractComplexity(project, projectType);
-  //println("======");
+  //println("====== GetComplexityRank");
   //for(f <- facts) {
   //  println("CC: <f.CC>\tlines: <f.lines>\t<f.method>");
   //}
@@ -50,6 +50,12 @@ Rank GetDuplicationRank(loc project, str projectType)
 
 Rank GetUnitSizeRank(loc project, str projectType)
 {
-  //TODO: implement
-  return VeryLow(0);
+  facts = ExtractUnitSizes(project, projectType);
+  //println("====== GetUnitSizeRank");
+  //println("facts: <facts>");
+  //println("======");
+  
+  result = AnalyzeUnitSize(facts);
+  
+  return result;
 }
