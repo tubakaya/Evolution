@@ -9,8 +9,6 @@ import String;
 import ParseTree;
 import Map;
 
-
-/* Extracts only code lines*/
 public int ExtractTotalLOC(loc project, str ext)
 {
 	list[loc] allFiles = GetAllFiles(project, ext);
@@ -138,43 +136,9 @@ list[loc] GetAllFiles(loc project, str ext)
 list[str] GetCodeLines(loc location)
 {
 	list[str] allLines = readFileLines(location);
-	list[str] codeLines = [];
-	
-	bool inCommentBlock = false;
-	for( l <- allLines)
-	{
-		str lt = trim(l);
-		if(inCommentBlock)
-		{
-			if(endsWith(lt, "*/"))
-			{
-				inCommentBlock = false;				
-			}
-			fail;
-		}
-		else if(startsWith(lt, "/*"))
-		{
-			inCommentBlock = true;
-			fail;
-		}
-		else if(isEmpty(lt))
-		{
-			fail;
-		}
-		inCommentBlock = false;
-		codeLines += l;
-	}
-	
-	return codeLines;
-}
-
-list[str] GetCodeLinesOfProject(loc project)
-{
-	myModel = createM3FromEclipseProject(project);
-	/*set[loc] fields = fields(myModel);*/
-	set[loc] myMethods = methods(myModel);
-	list[str] codeLines = [readFileLines(m) | m <- myMethods];
-	/*codeLines += [readFileLines(m) |f <- fields];*/
-	
-	return codeLines;
+	return codeLines = [l | l <- allLines
+					, !isEmpty(trim(l))
+					, !startsWith(trim(l),"/*")
+					, !startsWith(trim(l),"*")
+					, !endsWith(trim(l),"*/")];
 }
