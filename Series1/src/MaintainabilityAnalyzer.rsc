@@ -32,9 +32,7 @@ Rank GetComplexityRank(loc project, str projectType)
 {
   facts = ExtractComplexity(project, projectType);
   //println("====== GetComplexityRank");
-  //for(f <- facts) {
-  //  println("CC: <f.CC>\tlines: <f.lines>\t<f.method>");
-  //}
+  //for(f <- facts) println("CC: <f.CC>\tlines: <f.lines>\t<f.method>");
   //println("======");
   
   result = AnalyzeComplexity(facts);
