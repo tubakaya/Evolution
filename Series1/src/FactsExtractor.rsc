@@ -142,27 +142,29 @@ list[str] GetCodeLines(loc location)
 	bool inCommentBlock = false;
 	for( l <- allLines)
 	{
-		str lt=trim(l);
-		if(startsWith(lt,"/*"))
+		str lt = trim(l);
+		if(inCommentBlock)
+		{
+			if(endsWith(lt, "*/"))
+			{
+				inCommentBlock = false;				
+			}
+			fail;
+		}
+		else if(startsWith(lt, "/*"))
 		{
 			inCommentBlock = true;
 			fail;
 		}
-		if(endsWith(lt,"*/"))
-		{
-			inCommentBlock = false;
-			fail;
-		}
-		if(isEmpty(lt))
+		else if(isEmpty(lt))
 		{
 			fail;
 		}
-		else
-		{
-			inCommentBlock = false;
-			codeLines += l;
-		}
+		inCommentBlock = false;
+		codeLines += l;
 	}
+	
+	return codeLines;
 }
 
 list[str] GetCodeLinesOfProject(loc project)
