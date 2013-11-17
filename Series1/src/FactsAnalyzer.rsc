@@ -7,23 +7,26 @@ import IO;
 import util::Math;
 
 
-/*It would be nicer if we had a map[Expr,Rank]
-map[int, Rank] JavaLocRank = 
+/*
+  It would be nicer if we had a map[Expr,Rank]
+  map[int, Rank] JavaLocRank = 
    ( 66  : VeryHigh
 	,246 : High
 	,665 : Moderate
-	,1310: Low);*/
-
-
-/*Volume ranking is calculated so:
-Function point per language is calculated and you can see this from LOCRatio above.
-Total lines of code divided by 1000 gives total KLOC.
-In Java language, 
-0-66KLOC is ranked as VeryHigh,
-66-246KLOC is ranked as High,
-246-665KLOC is ranked as Moderate,
-655-1,310KLOC is ranked as Low,
->1,310KLOC is ranked as VeryLow */
+	,1310: Low);
+*/
+/*
+  Volume ranking is calculated so:
+    Function point per language is calculated and you can see this from LOCRatio above.
+    Total lines of code divided by 1000 gives total KLOC.
+  
+  In Java language, 
+    0-66KLOC is ranked as VeryHigh,
+    66-246KLOC is ranked as High,
+    246-665KLOC is ranked as Moderate,
+    655-1,310KLOC is ranked as Low,
+    >1,310KLOC is ranked as VeryLow
+*/
 public Rank AnalyzeVolume(int LOC)
 {
 	num kloc = LOC/1000;
@@ -66,6 +69,7 @@ public Rank AnalyzeComplexity(list[tuple[loc method, int CC, int lines]] facts)
   	Calculation based on "A Practical Model for Measuring Maintainability",
   						 Ilja Heitlager, Tobias Kuipers, Joost Visser
   */
+  //TODO: now the totalLOC is based on methods LOC, or should it be on project LOC? 
   totalLOC = (0 | it + l | <m, C, l> <- facts);
 
   /*
@@ -137,19 +141,23 @@ public Rank AnalyzeComplexity(list[tuple[loc method, int CC, int lines]] facts)
   return result;
 }
 
-/*Find the percentage of dublicated code to the whole project.
-Ranking is so:
-0-3% VeryHigh
-3-5% High
-5-10% Moderate
-10-20% Low
-20-100% Very Low*/
-public Rank AnalyzeDublication(int amountOfDublication)
+/*
+  Find the percentage of duplicated code to the whole project.
+  Ranking is so:
+    0-3% VeryHigh
+    3-5% High
+    5-10% Moderate
+    10-20% Low
+    20-100% Very Low
+*/
+public Rank AnalyzeDuplication(int amountOfDuplication)
 {
 }
 
 public Rank AnalyzeUnitSize()
-{}
+{
+}
 
 public Rank AnalyzeUnitTesting()
-{}
+{
+}

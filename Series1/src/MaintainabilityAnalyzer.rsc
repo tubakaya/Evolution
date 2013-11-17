@@ -7,7 +7,7 @@ import FactsAnalyzer;
 import Ranking;
 
 /*Calls analyze methods in FactsAnalyzer to find the rankings
-for the volume, cyclometic complexity, dublication, unit size and unit testing.
+for the volume, cyclometic complexity, duplication, unit size and unit testing.
 Returns a map with the name of the metric and the rank.*/
 public map[str, Rank] AnalyzeMaintainability(loc project, str projectType)
 {
@@ -45,11 +45,11 @@ Rank GetComplexityRank(loc project, str projectType)
 Rank GetDuplicationRank(loc project, str projectType)
 {
   //TODO: implement
-  return Moderate(0);
+  return VeryLow(0);
 }
 
 Rank GetUnitSizeRank(loc project, str projectType)
 {
   //TODO: implement
-  return Moderate(0);
+  return VeryLow(0);
 }

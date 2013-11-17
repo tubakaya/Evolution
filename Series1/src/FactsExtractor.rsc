@@ -10,7 +10,9 @@ import ParseTree;
 import Map;
 
 
-/* Extracts only code lines*/
+/*
+  Extracts only code lines
+*/
 public int ExtractTotalLOC(loc project, str ext)
 {
 	list[loc] allFiles = GetAllFiles(project, ext);
@@ -41,16 +43,18 @@ public list[tuple[loc method, int CC, int lines]] ExtractComplexity(loc project,
   list[tuple[loc, int, int]] result = [];
   for(m <- methods)
   {
-    int cc = cyclomaticComplexity(m);
-  	int lines = size(readFileLines(m@\loc));
+    int cc = CyclomaticComplexity(m);
+  	int lines = size(GetCodeLines(m@\loc));
   	result += <m@\loc, cc, lines>;
   }
 
   return result;
 }
 
-//	calculate CC from http://www.rascal-mpl.org/#_Metrics
-int cyclomaticComplexity(MethodDec m) {
+/*
+  Calculate CyclomaticComplexity: from http://www.rascal-mpl.org/#_Metrics
+*/
+int CyclomaticComplexity(MethodDec m) {
   result = 1;
   visit (m) {
     case (Stm)`do <Stm _> while (<Expr _>);`: result += 1;
@@ -67,7 +71,9 @@ int cyclomaticComplexity(MethodDec m) {
   return result;
 }
 
-/*Extract the amount of duplicate code of at least 6 lines*/
+/*
+  Extract the amount of duplicate code of at least 6 lines
+*/
 public int ExtractDuplicateCount(loc project, str ext)
 {	
 	int counter = 0;
