@@ -7,6 +7,7 @@ import List;
 import IO;
 import String;
 import ParseTree;
+import Map;
 
 
 /* Extracts only code lines*/
@@ -65,51 +66,59 @@ int cyclomaticComplexity(MethodDec m) {
   return result;
 }
 
-
-
 /*Extract the amount of duplicate code of at least 6 lines*/
 public int ExtractDuplicateCount(loc project, str ext)
-{
+{	
 	int counter = 0;
 
 	list[loc] allFiles = GetAllFiles(project, ext);
 	
 	map[loc, list[str]] fileCodeLines = (f:GetCodeLines(f) | f <- allFiles);
 	map[loc, list[str]] compareList = fileCodeLines;
-	for((f:lines1) <- fileCodeLines)
+	
+	/*Find same lines from all files*/
+	map[tuple[loc,str], tuple[loc,str]] equalLines = ();
+	for(f1 <- fileCodeLines)
 	{
-		compareList = delete(compareList, f);
-		for( (f2:lines2) <- compareList)
+		list[str] lines1 = fileCodeLines[f1];
+		compareList = delete(compareList, f1);
+		for(f2 <- compareList)
 		{
-			rel[str,str] equalLines = {<l1,l2> | l1 <- lines1, l2 <- lines2, l1 == l2};
-			
-			/*check the 6 lines starting with l1*/
-			for( <el1,el2> <- equalLines)
-			{
-				int index1 = indexOf(lines1,el1) +1;
-				int index2 = indexOf(lines1,el1) +1;
-				
-				bool duplicate = true;
-				for(i<-[1..6])
-				{
-					if(lines1[index1] != lines2[index2])
-					{
-					 	duplicate = false;
-						fail;
-					}
-					index1 +=1;
-					index2 +=1;
-				}
-				
-				if(dublicate)
-				{
-					count += 1;
-				}
-			}
+			list[str] lines2 = fileCodeLines[f2];
+			equalLines += (<f1,l1>:<f2,l2> |l1 <- lines1, l2 <- lines2, l1 == l2);
 		}
 	}
+
+	/*check the 6 lines starting with l1*/
+	for( <f1,l1> <- equalLines)
+	{
+		tuple[loc file,list[str] lines] f2L2 = equalLines[<f1,l1>];
+		loc f2 = f2L2.file;
+		list[str] lines1 = fileCodeLines[f1];
+		list[str] lines2 = fileCodeLines[f2];
 	
-	return count;
+		int index1 = indexOf(lines1,l1) +1;
+		int index2 = indexOf(lines2,l2) +1;
+				
+		bool duplicate = true;
+		for(i<-[1..6])
+		{
+			if(lines1[index1] != lines2[index2])
+			{
+				duplicate = false;
+				fail;
+			}
+			index1 +=1;
+			index2 +=1;
+		}
+				
+		if(dublicate)
+		{
+			counter += 1;
+		}
+	}	
+	
+	return counter;
 }
 
 public list[int] ExtractUnitSizes(loc project)
@@ -131,4 +140,15 @@ list[str] GetCodeLines(loc file)
 				, !isEmpty(trim(l))
 				, !startsWith(trim(l),"/*")
 				, !endsWith(trim(l),"*/")];
+}
+
+list[str] GetCodeLinesOfProject(loc project)
+{
+	myModel = createM3FromEclipseProject(project);
+	/*set[loc] fields = fields(myModel);*/
+	set[loc] myMethods = methods(myModel);
+	list[str] codeLines = [readFileLines(m) | m <- myMethods];
+	/*codeLines += [readFileLines(m) |f <- fields];*/
+	
+	return codeLines;
 }
