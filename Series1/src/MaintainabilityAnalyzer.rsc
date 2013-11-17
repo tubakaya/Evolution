@@ -31,9 +31,15 @@ Rank GetVolumeRank(loc project, str projectType)
 Rank GetComplexityRank(loc project, str projectType)
 {
   facts = ExtractComplexity(project, projectType);
-  println("facts: <facts>");
+  //println("======");
+  //for(f <- facts) {
+  //  println("CC: <f.CC>\tlines: <f.lines>\t<f.method>");
+  //}
+  //println("======");
+  
   result = AnalyzeComplexity(facts);
-  return Moderate(0);
+
+  return result;
 }
 
 Rank GetDuplicationRank(loc project, str projectType)

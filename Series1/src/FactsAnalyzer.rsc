@@ -4,6 +4,7 @@ import Ranking;
 
 import lang::java::\syntax::Java15;
 import IO;
+import util::Math;
 
 
 /*It would be nicer if we had a map[Expr,Rank]
@@ -61,12 +62,14 @@ public Rank AnalyzeVolume(int LOC)
 
 public Rank AnalyzeComplexity(list[tuple[loc method, int CC, int lines]] facts)
 {
-/*
-  parameter:
-  	map[loc method, tuple[int cc, int lines]]
-  	
-  todo:
-    for all methods (loc)
+  /*
+  	Calculation based on "A Practical Model for Measuring Maintainability",
+  						 Ilja Heitlager, Tobias Kuipers, Joost Visser
+  */
+  totalLOC = (0 | it + l | <m, C, l> <- facts);
+
+  /*
+    for all methods
       calculate it's risk evaluation based on:
 		CC		Risk evaluation
 		1-10	simple, without much risk
@@ -76,30 +79,62 @@ public Rank AnalyzeComplexity(list[tuple[loc method, int CC, int lines]] facts)
 		
 	  for each risk evaluation calculate the number of lines
 	  as percentage to LOC
-	  
-	  determine ranking based on:
-				maximum relative LOC
-		rank	moderate	high	very high
-		++		25%			0%		0%
-		+		30%			5%		0%
-		o		40%			10%		0%
-		-		50%			15%		5%
-		--		-			-		-	  
-*/
-
-  // print facts
-  println("=== FACTS ===");
+  */
+  //TODO: how to make data types like these?
+  //data Risk = tuple[int lines, int percentage];
+  //data Risks = tuple[Risk low, Risk moderate, Risk high, Risk veryhigh]; 
+  int low = 0;
+  int moderate = 0;
+  int high = 0;
+  int veryhigh = 0;
+  
   for(f <- facts) {
-    println("CC = <f.CC>, lines = <f.lines>");
+  	if (f.CC <= 10) {
+  	  low += f.lines;
+  	} else if (f.CC <= 20) {
+  	  moderate += f.lines;
+  	} else if (f.CC <= 30) {
+  	  high += f.lines;
+  	} else {
+  	  veryhigh += f.lines;
+  	}
   }
-  println("=== FACTS ===");
+  lowPerc = round((low / toReal(totalLOC)) * 100);
+  moderatePerc = round((moderate / toReal(totalLOC)) * 100);
+  highPerc = round((high / toReal(totalLOC)) * 100);
+  // to avoid rounding errors we calculate veryhigh risk as the remainder of 100%
+  veryhighPerc = 100 - highPerc - moderatePerc - lowPerc;
+  
+  //println("======");
+  //println("totalLOC: <totalLOC>");
+  //println("     low: #<low>\t<lowPerc>%");
+  //println("moderate: #<moderate>\t<moderatePerc>%");
+  //println("    high: #<high>\t<highPerc>%");
+  //println("veryhigh: #<veryhigh>\t<veryhighPerc>%");
+  //println("======");
 
-  // calculate total LOC
-  totalLOC = (0 | it + l | <m, C, l> <- facts);
-  println("totalLOC: <totalLOC>");
+  /*
+	determine ranking based on:
+			maximum relative LOC
+	rank	moderate	high	very high
+	++		25%			0%		0%
+	+		30%			5%		0%
+	o		40%			10%		0%
+	-		50%			15%		5%
+	--		-			-		-	  
+  */
+  result = VeryLow(0);
+  if ((moderatePerc <= 25) && (highPerc <= 0) && (veryhighPerc <= 0)) {
+    result = VeryHigh(0);
+  } else if ((moderatePerc <= 30) && (highPerc <= 5) && (veryhighPerc <= 0)) {
+    result = High(0);
+  } else if ((moderatePerc <= 40) && (highPerc <= 10) && (veryhighPerc <= 0)) {
+    result = Moderate(0);
+  } else if ((moderatePerc <= 50) && (highPerc <= 15) && (veryhighPerc <= 5)) {
+    result = Low(0);
+  }
 
-
-	return Moderate(0);
+  return result;
 }
 
 /*Find the percentage of dublicated code to the whole project.
