@@ -6,6 +6,7 @@ import Ranking;
 public map[str,Rank] Main()
 {
 	  loc project=|project://TestJ|;
+	  //
 	  //loc project=|project://SmallSql|;
 	  str projectType="java";
 
