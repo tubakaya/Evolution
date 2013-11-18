@@ -1,9 +1,9 @@
 module FactsAnalyzer
 
 import Ranking;
+import Utils;
 
 import lang::java::\syntax::Java15;
-import IO;
 import util::Math;
 import List;
 
@@ -63,16 +63,16 @@ public Rank AnalyzeVolume(int LOC)
 	}*/
 }
 
-public Rank AnalyzeComplexity(list[tuple[loc method, int CC, int lines]] facts)
+
+//TODO: how to make data types like these?
+//data RiskType = Risk(tuple[int lines, int percentage]);
+//data RisksType = RisksType(tuple[Risk low, Risk moderate, Risk high, Risk veryhigh]);
+public Rank AnalyzeComplexity(int totalLOC, list[tuple[loc method, int CC, int lines]] facts)
 {
   /*
   	Calculation based on "A Practical Model for Measuring Maintainability",
   						 Ilja Heitlager, Tobias Kuipers, Joost Visser
-  */
-  //TODO: now the totalLOC is based on methods LOC, or should it be on project LOC? 
-  totalLOC = (0 | it + l | <m, C, l> <- facts);
 
-  /*
     for all methods
       calculate it's risk evaluation based on:
 		CC		Risk evaluation
@@ -84,9 +84,6 @@ public Rank AnalyzeComplexity(list[tuple[loc method, int CC, int lines]] facts)
 	  for each risk evaluation calculate the number of lines
 	  as percentage to LOC
   */
-  //TODO: how to make data types like these?
-  //data Risk = tuple[int lines, int percentage];
-  //data Risks = tuple[Risk low, Risk moderate, Risk high, Risk veryhigh]; 
   int low = 0;
   int moderate = 0;
   int high = 0;
@@ -108,13 +105,13 @@ public Rank AnalyzeComplexity(list[tuple[loc method, int CC, int lines]] facts)
   // to avoid rounding errors we calculate veryhigh risk as the remainder of 100%
   veryhighPerc = 100 - highPerc - moderatePerc - lowPerc;
   
-  //println("======");
-  //println("totalLOC: <totalLOC>");
-  //println("     low: #<low>\t<lowPerc>%");
-  //println("moderate: #<moderate>\t<moderatePerc>%");
-  //println("    high: #<high>\t<highPerc>%");
-  //println("veryhigh: #<veryhigh>\t<veryhighPerc>%");
-  //println("======");
+  debug("======\n" + 
+        "totalLOC: <totalLOC>\n" + 
+        "     low: #<low>\t<lowPerc>%\n" +
+        "moderate: #<moderate>\t<moderatePerc>%\n" +
+        "    high: #<high>\t<highPerc>%\n" +
+        "veryhigh: #<veryhigh>\t<veryhighPerc>%\n" +
+        "======");
 
   /*
 	determine ranking based on:
@@ -165,7 +162,7 @@ public Rank AnalyzeUnitSize(list[int] facts)
   	To get some reasonable thresholds we use research data from
   	"Code Complete", 2003, Steven C. McConnell, chapter 7.4
   	
-  	For risk evaluation categorization the following thresholds are used:   
+  	For risk evaluation categorization the following threshold values are used:   
 		LOC		Risk evaluation
 		1-10	simple, without much risk 
 		11-100	more complex, moderate risk
@@ -208,13 +205,13 @@ public Rank AnalyzeUnitSize(list[int] facts)
   // to avoid rounding errors we calculate veryhigh risk as the remainder of 100%
   veryhighPerc = 100 - highPerc - moderatePerc - lowPerc;
   
-  //println("======");
-  //println("totalLOC: <totalLOC>");
-  //println("     low: #<low>\t<lowPerc>%");
-  //println("moderate: #<moderate>\t<moderatePerc>%");
-  //println("    high: #<high>\t<highPerc>%");
-  //println("veryhigh: #<veryhigh>\t<veryhighPerc>%");
-  //println("======");
+  debug("======\n" + 
+        "totalLOC: <totalLOC>\n" + 
+        "     low: #<low>\t<lowPerc>%\n" +
+        "moderate: #<moderate>\t<moderatePerc>%\n" +
+        "    high: #<high>\t<highPerc>%\n" +
+        "veryhigh: #<veryhigh>\t<veryhighPerc>%\n" +
+        "======");
 
   result = VeryLow(0);
   if ((moderatePerc <= 25) && (highPerc <= 0) && (veryhighPerc <= 0)) {

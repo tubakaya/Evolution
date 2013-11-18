@@ -31,6 +31,8 @@ public int ExtractTotalLOC(loc project, str ext)
   Extract the Cyclomatic Complexity of all methods in project
   Return a list of tuples with (method-location, CC, number-of-lines)
 */
+//data MethodInfo = methodInfo(loc method, int complexity, int LOC);
+//data MethodsInfo = methodsInfo(list[MethodInfo] methods);
 public list[tuple[loc method, int CC, int lines]] ExtractComplexity(loc project, str ext)
 {
   list[loc] allFiles = GetAllFiles(project, ext);
@@ -166,6 +168,7 @@ list[str] GetCodeLines(loc location)
 	list[str] allLines = readFileLines(location);
 	return codeLines = [l | l <- allLines
 					, !isEmpty(trim(l))
+					, !startsWith(trim(l),"//")
 					, !startsWith(trim(l),"/*")
 					, !startsWith(trim(l),"*")
 					, !endsWith(trim(l),"*/")];

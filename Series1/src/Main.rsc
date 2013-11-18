@@ -2,15 +2,17 @@ module Main
 
 import MaintainabilityAnalyzer;
 import Ranking;
+import Utils;
 
-public map[str,Rank] Main()
+public map[str, Rank] Main()
 {
-	  loc project=|project://TestJ|;
-	  //
-	  //loc project=|project://SmallSql|;
-	  str projectType="java";
+  loc project=|project://TestJ|;
+  //loc project=|project://SmallSql|;
+  str projectType="java";
 
-	  return AnalyzeMaintainability(project,projectType);
+  result = AnalyzeMaintainability(project, projectType);
+  
+  return result;
 
 	  /*change the return type to void and visualize results	
 	  for( (s:r) <- result)
