@@ -65,7 +65,7 @@ Rank GetComplexityRank(loc project, str projectType)
   
   //TODO: it is not optimal te extractTotalLOC again, gather general facts about
   //      the project instead of re-calculating it again
-  totalLOC = ExtractTotalLOC(project,projectType);
+  totalLOC = ExtractTotalLOC(project, projectType);
   result = AnalyzeComplexity(totalLOC, facts);
 
   return result;
