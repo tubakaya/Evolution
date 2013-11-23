@@ -1,5 +1,10 @@
 module FactExtractors::UnitSizeExtractor
+
 import FactExtractors::ExtractorCommon;
+
+import lang::java::\syntax::Java15;
+import ParseTree;
+import List;
 
 /*
   Extract the LOC of all methods in project

@@ -1,7 +1,9 @@
 module FactExtractors::DuplicationCountExtractor
+
+import FactExtractors::ExtractorCommon;
+
 import Set;
 import List;
-import FactExtractors::ExtractorCommon;
 
 data blockType = block(loc file, list[str] lines, int lineNumberStartsAt);
 

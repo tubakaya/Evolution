@@ -1,5 +1,8 @@
 module FactExtractors::TotalLOCExtractor
+
 import FactExtractors::ExtractorCommon;
+
+import List;
 
 /*
   Extracts only code lines

@@ -1,5 +1,10 @@
 module FactExtractors::ComplexityExtractor
+
 import FactExtractors::ExtractorCommon;
+
+import lang::java::\syntax::Java15;
+import ParseTree;
+import List;
 
 /*
   Extract the Cyclomatic Complexity of all methods in project

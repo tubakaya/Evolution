@@ -3,7 +3,6 @@ module FactsAnalyzer
 import Ranking;
 import Utils;
 
-import lang::java::\syntax::Java15;
 import util::Math;
 import List;
 

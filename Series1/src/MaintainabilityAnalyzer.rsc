@@ -16,11 +16,11 @@ import Utils;
     pass it to each ExtractXXX and AnalyzeXXX funtion.
     
     For example:
-      data FactsType = Facts(
-        tuple [int totalLOC, 
-               list[tuple[loc method, int complexity, int LOC]] methodInfo,
-               ... information for duplication...
-              ]
+      data MethodInfo = methodInfo(loc method, int complexity, int LOC);
+      data Facts = facts(
+        int totalLOC, 
+        list[MethodInfo] methods,
+        ... information for duplication...
       );
     
     Then each call to the ExtractXXX and AnalyzeXXX functions could be like:
