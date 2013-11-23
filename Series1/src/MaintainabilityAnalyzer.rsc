@@ -1,6 +1,9 @@
 module MaintainabilityAnalyzer
 
-import FactsExtractor;
+import FactExtractors::ComplexityExtractor;
+import FactExtractors::DuplicationCountExtractor;
+import FactExtractors::TotalLOCExtractor;
+import FactExtractors::UnitSizeExtractor;
 import FactsAnalyzer;
 import Ranking;
 import Utils;
