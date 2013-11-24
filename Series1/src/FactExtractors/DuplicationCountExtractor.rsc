@@ -1,4 +1,8 @@
+@contributor{Sander Leer - Sander.Leer@gmail.com}
+@contributor{Tuba Kaya Chomette - admin@tubakaya.com}
+
 module FactExtractors::DuplicationCountExtractor
+
 import Set;
 import List;
 import FactExtractors::ExtractorCommon;

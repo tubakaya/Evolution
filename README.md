@@ -1,6 +1,7 @@
 # Series 1- Design (functional / technical)
 *Software Evolution Series 1 Assignment*
 
+**Authors:** Sander Leer (Sander.Leer@gmail.com), Tuba Kaya Chomette (admin@tubakaya.com)
 
 ## Goals
 Some relevant questions are:

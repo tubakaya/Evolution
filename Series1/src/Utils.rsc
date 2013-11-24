@@ -1,3 +1,6 @@
+@contributor{Sander Leer - Sander.Leer@gmail.com}
+@contributor{Tuba Kaya Chomette - admin@tubakaya.com}
+
 module Utils
 
 import IO;
