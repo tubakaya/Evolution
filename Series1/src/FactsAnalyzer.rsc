@@ -4,7 +4,6 @@ import FactsType;
 import Ranking;
 import Utils;
 
-import util::Math;
 import List;
 
 /*
@@ -57,27 +56,29 @@ data RiskEvaluation = riskEvaluation(
 RiskLevels calcRiskLevels(
   FactsType facts,
   RiskEvaluation evaluation,
-  bool (MethodInfoType m, int boundary) compareFunc
+  int (MethodInfoType mi) getField
 ) {
-  RiskLevels risks = riskLevels(riskLevel(0,0), riskLevel(0,0), riskLevel(0,0), riskLevel(0,0));
+  RiskLevels risks = riskLevels(riskLevel(0,0), riskLevel(0,0),
+    riskLevel(0,0), riskLevel(0,0));
 
   for(m <- facts.methods) {
-    if (compareFunc(m, evaluation.lowBoundary)) {
+    if (getField(m) <= evaluation.lowBoundary) {
       risks.low.LOC += m.LOC;
-    } else if (compareFunc(m, evaluation.moderateBoundary)) {
+    } else if (getField(m) <= evaluation.moderateBoundary) {
       risks.moderate.LOC += m.LOC;
-    } else if (compareFunc(m, evaluation.highBoundary)) {
+    } else if (getField(m) <= evaluation.highBoundary) {
       risks.high.LOC += m.LOC;
     } else {
       risks.veryhigh.LOC += m.LOC;
     }
   }
-  // calculate percentages, to avoid rounding errors we calculate the last
+  // calculate percentages, to avoid rounding errors calculate the last
   // percentage as the remainder of 100%
   risks.low.percentage = percentage(risks.low.LOC, facts.totalLOC);
   risks.moderate.percentage = percentage(risks.moderate.LOC, facts.totalLOC);
   risks.high.percentage = percentage(risks.high.LOC, facts.totalLOC);
-  risks.veryhigh.percentage = 100 - risks.high.percentage - risks.moderate.percentage - risks.low.percentage;
+  risks.veryhigh.percentage = 100 - risks.high.percentage -
+    risks.moderate.percentage - risks.low.percentage;
   
   return risks;
 }
@@ -141,9 +142,7 @@ public Rank AnalyzeComplexity(FactsType facts)
   risks = calcRiskLevels(
     facts,
     riskEvaluation(10, 20, 50),
-    bool (MethodInfoType m, int boundary) {
-      return (m.complexity <= boundary);
-    }
+    int (MethodInfoType m) { return m.complexity; }
   ); 
   /*debug*/ debug("== AnalyzeComplexity: risks = <risks>");
 
@@ -186,14 +185,13 @@ public Rank AnalyzeUnitSize(FactsType facts)
 		101-200	complex, high risk
 		   >200	untestable, very high risk
 		
-	Then again calculate the number of lines as percentage to LOC.
+	  for each risk evaluation aggregate the number of lines
+	  as percentage to LOC
   */
   risks = calcRiskLevels(
     facts,
     riskEvaluation(10, 100, 200),
-    bool (MethodInfoType m, int boundary) {
-      return (m.LOC <= boundary);
-    }
+    int (MethodInfoType m) { return m.LOC; }
   ); 
   /*debug*/ debug("== AnalyzeUnitSize: risks = <risks>");
 
@@ -270,25 +268,24 @@ public Rank AnalyzeAssertion(FactsType facts)
 		
 	  for each risk evaluation aggregate the number of lines
 	  as percentage to LOC
- 
-  	Determine ranking based on:
-			maximum relative LOC
-	  rank	moderate	high	very high
-	  ++	25%			0%		0%
-	  +		30%			5%		0%
-	  o		40%			10%		0%
-	  -		50%			15%		5%
-	  --		-			-		-	  
   */
   risks = calcRiskLevels(
     facts,
     riskEvaluation(0, 1, 4),
-    bool (MethodInfoType m, int boundary) {
-      return (m.assertCount <= boundary);
-    }
+    int (MethodInfoType m) { return m.assertCount; }
   ); 
   /*debug*/ debug("== AnalyzeAssertion: risks = <risks>");
 
+  /*
+  	The ranking is based on the following thresholds (same as complexity):
+				maximum relative LOC
+		rank	moderate	high	very high
+		++		25%			0%		0%
+		+		30%			5%		0%
+		o		40%			10%		0%
+		-		50%			15%		5%
+		--		-			-		-	  
+  */
   Footprint fp = footprint(
     <25,  0, 0>,
     <30,  5, 0>,
