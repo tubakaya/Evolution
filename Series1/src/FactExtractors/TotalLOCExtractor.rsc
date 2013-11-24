@@ -7,16 +7,15 @@ import List;
 /*
   Extracts only code lines
 */
-public int ExtractTotalLOC(loc project, str ext)
+public int ExtractTotalLOC(list[loc] allFiles)
 {
-	list[loc] allFiles = GetAllFiles(project, ext);
-	list[list[str]] codeLines = [GetCodeLines(f) | f <- allFiles ];
-	
-	int counter = 0;
-	for( i <- [0..size(codeLines)])
-	{
-		counter += size(codeLines[i]);
-	}
-	
-	return counter;
+        list[list[str]] codeLines = [GetCodeLines(f) | f <- allFiles ];
+        
+        int counter = 0;
+        for( i <- [0..size(codeLines)])
+        {
+                counter += size(codeLines[i]);
+        }
+        
+        return counter;
 }

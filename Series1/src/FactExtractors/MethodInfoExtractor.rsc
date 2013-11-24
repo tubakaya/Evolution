@@ -14,13 +14,12 @@ import FactExtractors::ExtractorCommon;
 /*
   Get information about all method in project. 
 */
-public list[MethodInfoType] ExtractMethodInfo(loc project, str ext)
+public list[MethodInfoType] ExtractMethodInfo(loc project, list[loc] allFiles)
 {
   /*debug*/ debug("extracting method info...");
   /*debug*/ debug("\tproject = <project>");
 
   list[MethodInfoType] result = [];
-  list[loc] allFiles = GetAllFiles(project, ext);
   
   /*debug*/ int totalFiles = size(allFiles);
   /*debug*/ debug("\ttotal files = <totalFiles>");
@@ -42,11 +41,11 @@ public list[MethodInfoType] ExtractMethodInfo(loc project, str ext)
       /*debug*/ j = j + 1;
     
       result += MethodInfo(
-  	              method@\loc,
-  	              size(GetCodeLines(method@\loc)),
-  	              CyclomaticComplexity(method),
-  	              CountAssertion(method)
-  	            );
+                        method@\loc,
+                        size(GetCodeLines(method@\loc)),
+                        CyclomaticComplexity(method),
+                        CountAssertion(method)
+                      );
     }
   }
   
@@ -87,4 +86,3 @@ int CountAssertion(MethodDec m) {
   }
   return result;
 }
-

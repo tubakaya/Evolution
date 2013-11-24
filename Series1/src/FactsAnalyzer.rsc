@@ -21,7 +21,7 @@ import List;
 public Rank AnalyzeVolume(FactsType facts)
 {
   num kloc = facts.totalLOC/1000;
-	
+        
   return if (kloc < 66) {
     VeryHigh(kloc);
   } else if (kloc < 246) {
@@ -124,20 +124,20 @@ Rank calcRating(RiskLevels risks, Footprint fp) {
 public Rank AnalyzeComplexity(FactsType facts)
 {
   /*
-  	Calculations based on "A Practical Model for Measuring Maintainability",
+          Calculations based on "A Practical Model for Measuring Maintainability",
     Ilja Heitlager, Tobias Kuipers, Joost Visser,
     http://homepages.cwi.nl/~jurgenv/teaching/evolution1213/papers/SMMQuatic.pdf
 
     For all methods
       calculate it's risk evaluation based on:
-		CC		Risk evaluation
-		1 -10	simple, low risk
-		11-20	more complex, moderate risk
-		21-50	complex, high risk
-		  >50	untestable, very high risk
-		
-	  for each risk evaluation aggregate the number of lines
-	  as percentage to LOC
+                CC                Risk evaluation
+                1 -10        simple, low risk
+                11-20        more complex, moderate risk
+                21-50        complex, high risk
+                  >50        untestable, very high risk
+                
+          for each risk evaluation aggregate the number of lines
+          as percentage to LOC
   */
   risks = calcRiskLevels(
     facts,
@@ -148,14 +148,14 @@ public Rank AnalyzeComplexity(FactsType facts)
 
 
   /*
-	Determine ranking based on:
-			maximum relative LOC
-	rank	moderate	high	very high
-	++		25%			0%		0%
-	+		30%			5%		0%
-	o		40%			10%		0%
-	-		50%			15%		5%
-	--		-			-		-	  
+        Determine ranking based on:
+                        maximum relative LOC
+        rank        moderate        high        very high
+        ++                25%                        0%                0%
+        +                30%                        5%                0%
+        o                40%                        10%                0%
+        -                50%                        15%                5%
+        --                -                        -                -          
   */
   Footprint fp = footprint(
     <25,  0, 0>,
@@ -170,23 +170,23 @@ public Rank AnalyzeComplexity(FactsType facts)
 public Rank AnalyzeUnitSize(FactsType facts)
 {
   /*
-  	In "A Practical Model for Measuring Maintainability" no thresholds are
-  	given what is considerd to be a 'good' unit size.
-  	It is stated to use scoring guidelines from Complexity per unit,
-  	but with different (non specified) threshold values.
-  	
-  	To get some reasonable thresholds we use research data from
-  	  Code Complete, 2003, Steven C. McConnell, chapter 7.4
-  	
-  	For risk evaluation categorization the following threshold values are used:   
-		LOC		Risk evaluation
-		1  -10	simple, low risk 
-		11 -100	more complex, moderate risk
-		101-200	complex, high risk
-		   >200	untestable, very high risk
-		
-	  for each risk evaluation aggregate the number of lines
-	  as percentage to LOC
+          In "A Practical Model for Measuring Maintainability" no thresholds are
+          given what is considerd to be a 'good' unit size.
+          It is stated to use scoring guidelines from Complexity per unit,
+          but with different (non specified) threshold values.
+          
+          To get some reasonable thresholds we use research data from
+            Code Complete, 2003, Steven C. McConnell, chapter 7.4
+          
+          For risk evaluation categorization the following threshold values are used:   
+                LOC                Risk evaluation
+                1  -10        simple, low risk 
+                11 -100        more complex, moderate risk
+                101-200        complex, high risk
+                   >200        untestable, very high risk
+                
+          for each risk evaluation aggregate the number of lines
+          as percentage to LOC
   */
   risks = calcRiskLevels(
     facts,
@@ -196,14 +196,14 @@ public Rank AnalyzeUnitSize(FactsType facts)
   /*debug*/ debug("== AnalyzeUnitSize: risks = <risks>");
 
   /*
-  	The ranking is based on the following thresholds (same as complexity):
-				maximum relative LOC
-		rank	moderate	high	very high
-		++		25%			0%		0%
-		+		30%			5%		0%
-		o		40%			10%		0%
-		-		50%			15%		5%
-		--		-			-		-	  
+          The ranking is based on the following thresholds (same as complexity):
+                                maximum relative LOC
+                rank        moderate        high        very high
+                ++                25%                        0%                0%
+                +                30%                        5%                0%
+                o                40%                        10%                0%
+                -                50%                        15%                5%
+                --                -                        -                -          
   */
   Footprint fp = footprint(
     <25,  0, 0>,
@@ -226,8 +226,28 @@ public Rank AnalyzeUnitSize(FactsType facts)
 */
 public Rank AnalyzeDuplication(FactsType facts)
 {
-  //TODO: implement
-  return Low(0);
+  int result = 100 * facts.duplicateCount/facts.totalLOC;
+  
+  if(result <= 3)
+  {
+  	return VeryHigh(result);
+  }
+  else if(result <= 5)
+  {
+  	return High(result);
+  }
+   else if(result <= 10)
+  {
+  	return Moderate(result);
+  }
+   else if(result <= 20)
+  {
+  	return Low(result);
+  }
+   else
+  {
+  	return VeryLow(result);
+  }
 }
 
 
@@ -260,14 +280,14 @@ public Rank AnalyzeAssertion(FactsType facts)
 
     For all methods
       calculate it's assertion density based on:
-		AD		Risk evaluation
-		0-0		very high risk
-		1-1		high risk
-		2-4		moderate risk
-		 >4		low risk
-		
-	  for each risk evaluation aggregate the number of lines
-	  as percentage to LOC
+                AD                Risk evaluation
+                0-0                very high risk
+                1-1                high risk
+                2-4                moderate risk
+                 >4                low risk
+                
+          for each risk evaluation aggregate the number of lines
+          as percentage to LOC
   */
   risks = calcRiskLevels(
     facts,
@@ -277,14 +297,14 @@ public Rank AnalyzeAssertion(FactsType facts)
   /*debug*/ debug("== AnalyzeAssertion: risks = <risks>");
 
   /*
-  	The ranking is based on the following thresholds (same as complexity):
-				maximum relative LOC
-		rank	moderate	high	very high
-		++		25%			0%		0%
-		+		30%			5%		0%
-		o		40%			10%		0%
-		-		50%			15%		5%
-		--		-			-		-	  
+          The ranking is based on the following thresholds (same as complexity):
+                                maximum relative LOC
+                rank        moderate        high        very high
+                ++                25%                        0%                0%
+                +                30%                        5%                0%
+                o                40%                        10%                0%
+                -                50%                        15%                5%
+                --                -                        -                -          
   */
   Footprint fp = footprint(
     <25,  0, 0>,

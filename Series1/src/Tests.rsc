@@ -1,23 +1,23 @@
 module Tests
 
 @memo value setUp() {
-	return "something";
+        return "something";
 }
 
 test bool Test1() {
-	myData = setUp();
-	
-	return true;
+        myData = setUp();
+        
+        return true;
 }
 
 test bool Test2() {
-	myData = setUp();
+        myData = setUp();
 
-	return true;
+        return true;
 }
 
 test bool Test3() {
-	myData = setUp();
+        myData = setUp();
 
-	return false;
+        return false;
 }
