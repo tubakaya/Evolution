@@ -56,4 +56,26 @@ Calculate number of assert statements
 1. Why is using `import lang::java::\syntax::Java15;` making Rascal go NUTS (performance wise)!! Because it is generating a parser every time this import unit is used?
 -  Is passing large amounts of data in and out a function a runtime performance bottleneck? Eg. `DataType func(DataType myData) {...}`. Is it passed by value and copied?
 
+## Results
+When running the program on the `SmallSql` Java project, these are the findings:
 
+- Duplication ranking: *this is ranking is not calculated due to performance issues*
+- Complexity ranking: Very Low
+- Unit size ranking: Very Low
+- Volume ranking: Very High
+- Assertion ranking: Very Low
+
+
+**Program output**
+
+    == AnalyzeComplexity: risks = riskLevels(riskLevel(15021,62),riskLevel(1579,7),riskLevel(2420,10),riskLevel(1255,21))
+    == AnalyzeUnitSize: risks = riskLevels(riskLevel(7497,31),riskLevel(10788,45),riskLevel(1122,5),riskLevel(868,19))
+    == AnalyzeAssertion: risks = riskLevels(riskLevel(20169,83),riskLevel(84,0),riskLevel(22,0),riskLevel(0,17))
+    == total time: 58.286 seconds
+    
+    map[str, Rank]: (
+      "Duplication":Low(0),
+      "Complexity":VeryLow(0),
+      "Unit size":VeryLow(0),
+      "Volume":VeryHigh(24),
+      "Assertion":VeryLow(0)

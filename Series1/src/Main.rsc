@@ -16,7 +16,7 @@ public map[str, Rank] Main()
   time = realTime(void() {
     result = AnalyzeMaintainability(project, projectType);
   });
-  debug("== real time: <time/1000.0> seconds");
+  debug("== total time: <time/1000.0> seconds");
   
   return result;
 }
