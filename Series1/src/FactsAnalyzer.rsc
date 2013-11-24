@@ -8,24 +8,16 @@ import util::Math;
 import List;
 
 /*
-  It would be nicer if we had a map[Expr,Rank]
-  map[int, Rank] JavaLocRank = 
-   ( 66  : VeryHigh
-	,246 : High
-	,665 : Moderate
-	,1310: Low);
-*/
-/*
   Volume ranking is calculated so:
     Function point per language is calculated and you can see this from LOCRatio above.
     Total lines of code divided by 1000 gives total KLOC.
   
   In Java language, 
-    0-66KLOC is ranked as VeryHigh,
-    66-246KLOC is ranked as High,
-    246-665KLOC is ranked as Moderate,
-    655-1,310KLOC is ranked as Low,
-    >1,310KLOC is ranked as VeryLow
+      0-66    KLOC is ranked as VeryHigh,
+     66-246   KLOC is ranked as High,
+    246-665   KLOC is ranked as Moderate,
+    655-1,310 KLOC is ranked as Low,
+       >1,310 KLOC is ranked as VeryLow
 */
 public Rank AnalyzeVolume(FactsType facts)
 {
@@ -108,10 +100,10 @@ public Rank AnalyzeComplexity(FactsType facts)
     For all methods
       calculate it's risk evaluation based on:
 		CC		Risk evaluation
-		1-10	simple, without much risk
+		1 -10	simple, without much risk
 		11-20	more complex, moderate risk
 		21-50	complex, high risk
-		> 50	untestable, very high risk
+		  >50	untestable, very high risk
 		
 	  for each risk evaluation aggregate the number of lines
 	  as percentage to LOC
@@ -137,7 +129,7 @@ public Rank AnalyzeComplexity(FactsType facts)
   risks.high.percentage = percentage(risks.high.LOC, facts.totalLOC);
   risks.veryhigh.percentage = 100 - risks.high.percentage - risks.moderate.percentage - risks.low.percentage;
 
-  debug("== AnalyzeComplexity: <risks>");
+  /*debug*/ debug("== AnalyzeComplexity: <risks>");
 
   /*
 	Determine ranking based on:
@@ -172,10 +164,10 @@ public Rank AnalyzeUnitSize(FactsType facts)
   	
   	For risk evaluation categorization the following threshold values are used:   
 		LOC		Risk evaluation
-		1-10	simple, without much risk 
-		11-100	more complex, moderate risk
+		  1-10	simple, without much risk 
+		 11-100	more complex, moderate risk
 		101-200	complex, high risk
-		> 200	untestable, very high risk
+		   >200	untestable, very high risk
 		
 	Then again calculate the number of lines as percentage to LOC.
   */
@@ -200,7 +192,7 @@ public Rank AnalyzeUnitSize(FactsType facts)
   risks.high.percentage = percentage(risks.high.LOC, facts.totalLOC);
   risks.veryhigh.percentage = 100 - risks.high.percentage - risks.moderate.percentage - risks.low.percentage;
 
-  debug("== AnalyzeUnitSize: <risks>");
+  /*debug*/ debug("== AnalyzeUnitSize: <risks>");
 
   /*
   	The ranking is based on the following thresholds (same as complexity):

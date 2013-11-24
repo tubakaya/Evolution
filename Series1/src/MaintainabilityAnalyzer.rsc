@@ -11,10 +11,9 @@ import FactExtractors::TotalLOCExtractor;
 import FactExtractors::UnitSizeExtractor;
 
 /*
-  This function first extracts all facts from the source code by the
-  ExtractXXX functions.
-  Then all gathered facts are analyzed by the AnaylzeXXX functions who
-  determine the ranking for the metrics.
+  First extract all facts from the source code by the ExtractXXX functions.
+  Then all facts are analyzed by the AnaylzeXXX functions who determine the
+  ranking for the metrics.
 */
 public map[str, Rank] AnalyzeMaintainability(loc project, str ext)
 {
