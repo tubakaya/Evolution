@@ -1,5 +1,6 @@
 module FactsAnalyzer
 
+import FactsType;
 import Ranking;
 import Utils;
 
@@ -26,40 +27,21 @@ import List;
     655-1,310KLOC is ranked as Low,
     >1,310KLOC is ranked as VeryLow
 */
-public Rank AnalyzeVolume(int LOC)
+public Rank AnalyzeVolume(FactsType facts)
 {
-	num kloc = LOC/1000;
+  num kloc = facts.totalLOC/1000;
 	
-	return if(kloc<66)
-	{
-	 VeryHigh(kloc);
-	}
-	else if(kloc<246)
-	{
-	 High(kloc);
-	}
-	else if(kloc<665)
-	{
-	 Moderate(kloc);
-	}
-	else if(kloc<1310)
-	{
-	 Low(kloc);
-	}
-	else
-	{
-	 VeryLow(kloc);
-	}
-	
-	/*list[int] limits = [jr | jr <- JavaLocRank];
-	for( i<-limits)
-	{
-		if(kloc<i)
-		{
-			Rank rank = JavaLocRank[i];
-			return rank(kloc);
-		}
-	}*/
+  return if (kloc < 66) {
+    VeryHigh(kloc);
+  } else if (kloc < 246) {
+    High(kloc);
+  } else if (kloc < 665) {
+    Moderate(kloc);
+  } else if (kloc < 1310) {
+    Low(kloc);
+  } else {
+    VeryLow(kloc);
+  }
 }
 
 
@@ -87,35 +69,6 @@ data Footprint = footprint(
   tuple[int moderate, int high, int veryhigh] moderate,
   tuple[int moderate, int high, int veryhigh] low
 );   
-
-RiskLevels aggregateRiskLevels(
-  int totalLOC,
-  list[tuple[loc method, int CC, int lines]] facts,
-  RiskEvaluation evaluationValues)
-{
-  RiskLevels risks = riskLevels(riskLevel(0,0), riskLevel(0,0), riskLevel(0,0), riskLevel(0,0));
-
-  for(f <- facts) {
-    if (f.CC <= evaluationValues.lowBoundary) {
-      risks.low.LOC += f.lines;
-    } else if (f.CC <= evaluationValues.moderateBoundary) {
-      risks.moderate.LOC += f.lines;
-    } else if (f.CC <= evaluationValues.highBoundary) {
-      risks.high.LOC += f.lines;
-    } else {
-      risks.veryhigh.LOC += f.lines;
-    }
-  }
-  	
-  // calculate percentages, to avoid rounding errors we calculate the last
-  // percentage as the remainder of 100%
-  risks.low.percentage = percentage(risks.low.LOC, totalLOC);
-  risks.moderate.percentage = percentage(risks.moderate.LOC, totalLOC);
-  risks.high.percentage = percentage(risks.high.LOC, totalLOC);
-  risks.veryhigh.percentage = 100 - risks.high.percentage - risks.moderate.percentage - risks.low.percentage;
-  
-  return risks;
-} 
 
 Rank calcRating(RiskLevels risks, Footprint fp) {
   result = VeryLow(0);
@@ -145,7 +98,8 @@ Rank calcRating(RiskLevels risks, Footprint fp) {
   return result;
 }
 
-public Rank AnalyzeComplexity(int totalLOC, list[tuple[loc method, int CC, int lines]] facts)
+
+public Rank AnalyzeComplexity(FactsType facts)
 {
   /*
   	Calculations based on "A Practical Model for Measuring Maintainability",
@@ -162,8 +116,28 @@ public Rank AnalyzeComplexity(int totalLOC, list[tuple[loc method, int CC, int l
 	  for each risk evaluation aggregate the number of lines
 	  as percentage to LOC
   */
-  risks = aggregateRiskLevels(totalLOC, facts, riskEvaluation(10, 20, 50));
-  debug("risks: <risks>");
+  RiskEvaluation evaluation = riskEvaluation(10, 20, 50);
+  RiskLevels risks = riskLevels(riskLevel(0,0), riskLevel(0,0), riskLevel(0,0), riskLevel(0,0));
+  for(m <- facts.methods) {
+    if (m.complexity <= evaluation.lowBoundary) {
+      risks.low.LOC += m.LOC;
+    } else if (m.complexity <= evaluation.moderateBoundary) {
+      risks.moderate.LOC += m.LOC;
+    } else if (m.complexity <= evaluation.highBoundary) {
+      risks.high.LOC += m.LOC;
+    } else {
+      risks.veryhigh.LOC += m.LOC;
+    }
+  }
+  	
+  // calculate percentages, to avoid rounding errors we calculate the last
+  // percentage as the remainder of 100%
+  risks.low.percentage = percentage(risks.low.LOC, facts.totalLOC);
+  risks.moderate.percentage = percentage(risks.moderate.LOC, facts.totalLOC);
+  risks.high.percentage = percentage(risks.high.LOC, facts.totalLOC);
+  risks.veryhigh.percentage = 100 - risks.high.percentage - risks.moderate.percentage - risks.low.percentage;
+
+  debug("== AnalyzeComplexity: <risks>");
 
   /*
 	Determine ranking based on:
@@ -184,21 +158,8 @@ public Rank AnalyzeComplexity(int totalLOC, list[tuple[loc method, int CC, int l
   return calcRating(risks, fp);
 }
 
-/*
-  Find the percentage of duplicated code to the whole project.
-  Ranking is so:
-    0-3% VeryHigh
-    3-5% High
-    5-10% Moderate
-    10-20% Low
-    20-100% Very Low
-*/
-public Rank AnalyzeDuplication(int amountOfDuplication)
-{
-}
 
-//TODO: this function is very much the same as AnalyzeComplexity!!
-public Rank AnalyzeUnitSize(list[int] facts)
+public Rank AnalyzeUnitSize(FactsType facts)
 {
   /*
   	In "A Practical Model for Measuring Maintainability" no thresholds are
@@ -217,7 +178,31 @@ public Rank AnalyzeUnitSize(list[int] facts)
 		> 200	untestable, very high risk
 		
 	Then again calculate the number of lines as percentage to LOC.
+  */
+  RiskEvaluation evaluation = riskEvaluation(10, 100, 200);
+  RiskLevels risks = riskLevels(riskLevel(0,0), riskLevel(0,0), riskLevel(0,0), riskLevel(0,0));
+  for(m <- facts.methods) {
+    if (m.LOC <= evaluation.lowBoundary) {
+      risks.low.LOC += m.LOC;
+    } else if (m.LOC <= evaluation.moderateBoundary) {
+      risks.moderate.LOC += m.LOC;
+    } else if (m.LOC <= evaluation.highBoundary) {
+      risks.high.LOC += m.LOC;
+    } else {
+      risks.veryhigh.LOC += m.LOC;
+    }
+  }
   	
+  // calculate percentages, to avoid rounding errors we calculate the last
+  // percentage as the remainder of 100%
+  risks.low.percentage = percentage(risks.low.LOC, facts.totalLOC);
+  risks.moderate.percentage = percentage(risks.moderate.LOC, facts.totalLOC);
+  risks.high.percentage = percentage(risks.high.LOC, facts.totalLOC);
+  risks.veryhigh.percentage = 100 - risks.high.percentage - risks.moderate.percentage - risks.low.percentage;
+
+  debug("== AnalyzeUnitSize: <risks>");
+
+  /*
   	The ranking is based on the following thresholds (same as complexity):
 				maximum relative LOC
 		rank	moderate	high	very high
@@ -227,52 +212,30 @@ public Rank AnalyzeUnitSize(list[int] facts)
 		-		50%			15%		5%
 		--		-			-		-	  
   */
-
-  //TODO: now the totalLOC is based on methods LOC, or should it be on project LOC? 
-  totalLOC = sum(facts);
-
-  int low = 0;
-  int moderate = 0;
-  int high = 0;
-  int veryhigh = 0;
-  for(i <- facts) {
-  	if (i <= 10) {
-  	  low += i;
-  	} else if (i <= 100) {
-  	  moderate += i;
-  	} else if (i <= 200) {
-  	  high += i;
-  	} else {
-  	  veryhigh += i;
-  	}
-  }
-  lowPerc = round((low / toReal(totalLOC)) * 100);
-  moderatePerc = round((moderate / toReal(totalLOC)) * 100);
-  highPerc = round((high / toReal(totalLOC)) * 100);
-  // to avoid rounding errors we calculate veryhigh risk as the remainder of 100%
-  veryhighPerc = 100 - highPerc - moderatePerc - lowPerc;
-  
-  debug("======\n" + 
-        "totalLOC: <totalLOC>\n" + 
-        "     low: #<low>\t<lowPerc>%\n" +
-        "moderate: #<moderate>\t<moderatePerc>%\n" +
-        "    high: #<high>\t<highPerc>%\n" +
-        "veryhigh: #<veryhigh>\t<veryhighPerc>%\n" +
-        "======");
-
-  result = VeryLow(0);
-  if ((moderatePerc <= 25) && (highPerc <= 0) && (veryhighPerc <= 0)) {
-    result = VeryHigh(0);
-  } else if ((moderatePerc <= 30) && (highPerc <= 5) && (veryhighPerc <= 0)) {
-    result = High(0);
-  } else if ((moderatePerc <= 40) && (highPerc <= 10) && (veryhighPerc <= 0)) {
-    result = Moderate(0);
-  } else if ((moderatePerc <= 50) && (highPerc <= 15) && (veryhighPerc <= 5)) {
-    result = Low(0);
-  }
-
-  return result;
+  Footprint fp = footprint(
+    <25,  0, 0>,
+    <30,  5, 0>,
+    <40, 10, 0>,
+    <50, 15, 5>
+  );
+  return calcRating(risks, fp);
 }
+
+
+/*
+  Find the percentage of duplicated code to the whole project.
+  Ranking is so:
+    0-3% VeryHigh
+    3-5% High
+    5-10% Moderate
+    10-20% Low
+    20-100% Very Low
+*/
+public Rank AnalyzeDuplication(FactsType facts)
+{
+  return Low(0);
+}
+
 
 public Rank AnalyzeUnitTesting()
 {

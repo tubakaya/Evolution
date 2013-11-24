@@ -52,4 +52,8 @@ Calculate number of assert statements
 - Calculate ranking per metric
 - Display the metrics
 
+## Questions
+1. Why is using `import lang::java::\syntax::Java15;` making Rascal go NUTS (performance wise)!! Because it is generating a parser every time this import unit is used?
+-  Is passing large amounts of data in and out a function a runtime performance bottleneck? Eg. `DataType func(DataType myData) {...}`. Is it passed by value and copied?
+
 

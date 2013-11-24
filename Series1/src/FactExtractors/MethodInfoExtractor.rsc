@@ -1,18 +1,15 @@
-module FactExtractors::ComplexityExtractor
+module FactExtractors::MethodInfoExtractor
 
-import FactExtractors::ExtractorCommon;
-
+//TODO: using the next import makes Rascal go NUTS (performance wise)!!
 import lang::java::\syntax::Java15;
 import ParseTree;
 import List;
 
-/*
-  Extract the Cyclomatic Complexity of all methods in project
-  Return a list of tuples with (method-location, CC, number-of-lines)
-*/
-//data MethodInfo = methodInfo(loc method, int complexity, int LOC);
-//data MethodsInfo = methodsInfo(list[MethodInfo] methods);
-public list[tuple[loc method, int CC, int lines]] ExtractComplexity(loc project, str ext)
+import FactsType;
+import FactExtractors::ExtractorCommon;
+
+
+public list[MethodInfoType] ExtractMethodInfo(loc project, str ext)
 {
   list[loc] allFiles = GetAllFiles(project, ext);
   set[MethodDec] methods = {};
@@ -20,15 +17,16 @@ public list[tuple[loc method, int CC, int lines]] ExtractComplexity(loc project,
   {
   	methods += {m | /MethodDec m := parse(#start[CompilationUnit], f)};
   }
-  
-  list[tuple[loc, int, int]] result = [];
-  for(m <- methods)
-  {
-    int cc = CyclomaticComplexity(m);
-  	int lines = size(GetCodeLines(m@\loc));
-  	result += <m@\loc, cc, lines>;
-  }
 
+  list[MethodInfoType] result = [];
+  for(method <- methods) {
+  	result += MethodInfo(
+  	            method@\loc,
+  	            size(GetCodeLines(method@\loc)),
+  	            CyclomaticComplexity(method)
+  	          );
+  }
+    
   return result;
 }
 
@@ -51,3 +49,4 @@ int CyclomaticComplexity(MethodDec m) {
   }
   return result;
 }
+
