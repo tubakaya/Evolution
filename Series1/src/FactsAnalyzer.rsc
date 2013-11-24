@@ -54,6 +54,35 @@ data RiskEvaluation = riskEvaluation(
   int highBoundary
 );
 
+RiskLevels calcRiskLevels(
+  FactsType facts,
+  RiskEvaluation evaluation,
+  bool (MethodInfoType m, int boundary) compareFunc
+) {
+  RiskLevels risks = riskLevels(riskLevel(0,0), riskLevel(0,0), riskLevel(0,0), riskLevel(0,0));
+
+  for(m <- facts.methods) {
+    if (compareFunc(m, evaluation.lowBoundary)) {
+      risks.low.LOC += m.LOC;
+    } else if (compareFunc(m, evaluation.moderateBoundary)) {
+      risks.moderate.LOC += m.LOC;
+    } else if (compareFunc(m, evaluation.highBoundary)) {
+      risks.high.LOC += m.LOC;
+    } else {
+      risks.veryhigh.LOC += m.LOC;
+    }
+  }
+  // calculate percentages, to avoid rounding errors we calculate the last
+  // percentage as the remainder of 100%
+  risks.low.percentage = percentage(risks.low.LOC, facts.totalLOC);
+  risks.moderate.percentage = percentage(risks.moderate.LOC, facts.totalLOC);
+  risks.high.percentage = percentage(risks.high.LOC, facts.totalLOC);
+  risks.veryhigh.percentage = 100 - risks.high.percentage - risks.moderate.percentage - risks.low.percentage;
+  
+  return risks;
+}
+
+
 //TODO: make footprints a list with Rank as a part of tuple
 data Footprint = footprint(
   tuple[int moderate, int high, int veryhigh] veryhigh,
@@ -95,12 +124,13 @@ public Rank AnalyzeComplexity(FactsType facts)
 {
   /*
   	Calculations based on "A Practical Model for Measuring Maintainability",
-  						  Ilja Heitlager, Tobias Kuipers, Joost Visser
+    Ilja Heitlager, Tobias Kuipers, Joost Visser,
+    http://homepages.cwi.nl/~jurgenv/teaching/evolution1213/papers/SMMQuatic.pdf
 
     For all methods
       calculate it's risk evaluation based on:
 		CC		Risk evaluation
-		1 -10	simple, without much risk
+		1 -10	simple, low risk
 		11-20	more complex, moderate risk
 		21-50	complex, high risk
 		  >50	untestable, very high risk
@@ -108,28 +138,15 @@ public Rank AnalyzeComplexity(FactsType facts)
 	  for each risk evaluation aggregate the number of lines
 	  as percentage to LOC
   */
-  RiskEvaluation evaluation = riskEvaluation(10, 20, 50);
-  RiskLevels risks = riskLevels(riskLevel(0,0), riskLevel(0,0), riskLevel(0,0), riskLevel(0,0));
-  for(m <- facts.methods) {
-    if (m.complexity <= evaluation.lowBoundary) {
-      risks.low.LOC += m.LOC;
-    } else if (m.complexity <= evaluation.moderateBoundary) {
-      risks.moderate.LOC += m.LOC;
-    } else if (m.complexity <= evaluation.highBoundary) {
-      risks.high.LOC += m.LOC;
-    } else {
-      risks.veryhigh.LOC += m.LOC;
+  risks = calcRiskLevels(
+    facts,
+    riskEvaluation(10, 20, 50),
+    bool (MethodInfoType m, int boundary) {
+      return (m.complexity <= boundary);
     }
-  }
-  	
-  // calculate percentages, to avoid rounding errors we calculate the last
-  // percentage as the remainder of 100%
-  risks.low.percentage = percentage(risks.low.LOC, facts.totalLOC);
-  risks.moderate.percentage = percentage(risks.moderate.LOC, facts.totalLOC);
-  risks.high.percentage = percentage(risks.high.LOC, facts.totalLOC);
-  risks.veryhigh.percentage = 100 - risks.high.percentage - risks.moderate.percentage - risks.low.percentage;
+  ); 
+  /*debug*/ debug("== AnalyzeComplexity: risks = <risks>");
 
-  /*debug*/ debug("== AnalyzeComplexity: <risks>");
 
   /*
 	Determine ranking based on:
@@ -160,39 +177,25 @@ public Rank AnalyzeUnitSize(FactsType facts)
   	but with different (non specified) threshold values.
   	
   	To get some reasonable thresholds we use research data from
-  	"Code Complete", 2003, Steven C. McConnell, chapter 7.4
+  	  Code Complete, 2003, Steven C. McConnell, chapter 7.4
   	
   	For risk evaluation categorization the following threshold values are used:   
 		LOC		Risk evaluation
-		  1-10	simple, without much risk 
-		 11-100	more complex, moderate risk
+		1  -10	simple, low risk 
+		11 -100	more complex, moderate risk
 		101-200	complex, high risk
 		   >200	untestable, very high risk
 		
 	Then again calculate the number of lines as percentage to LOC.
   */
-  RiskEvaluation evaluation = riskEvaluation(10, 100, 200);
-  RiskLevels risks = riskLevels(riskLevel(0,0), riskLevel(0,0), riskLevel(0,0), riskLevel(0,0));
-  for(m <- facts.methods) {
-    if (m.LOC <= evaluation.lowBoundary) {
-      risks.low.LOC += m.LOC;
-    } else if (m.LOC <= evaluation.moderateBoundary) {
-      risks.moderate.LOC += m.LOC;
-    } else if (m.LOC <= evaluation.highBoundary) {
-      risks.high.LOC += m.LOC;
-    } else {
-      risks.veryhigh.LOC += m.LOC;
+  risks = calcRiskLevels(
+    facts,
+    riskEvaluation(10, 100, 200),
+    bool (MethodInfoType m, int boundary) {
+      return (m.LOC <= boundary);
     }
-  }
-  	
-  // calculate percentages, to avoid rounding errors we calculate the last
-  // percentage as the remainder of 100%
-  risks.low.percentage = percentage(risks.low.LOC, facts.totalLOC);
-  risks.moderate.percentage = percentage(risks.moderate.LOC, facts.totalLOC);
-  risks.high.percentage = percentage(risks.high.LOC, facts.totalLOC);
-  risks.veryhigh.percentage = 100 - risks.high.percentage - risks.moderate.percentage - risks.low.percentage;
-
-  /*debug*/ debug("== AnalyzeUnitSize: <risks>");
+  ); 
+  /*debug*/ debug("== AnalyzeUnitSize: risks = <risks>");
 
   /*
   	The ranking is based on the following thresholds (same as complexity):
@@ -225,10 +228,72 @@ public Rank AnalyzeUnitSize(FactsType facts)
 */
 public Rank AnalyzeDuplication(FactsType facts)
 {
+  //TODO: implement
   return Low(0);
 }
 
 
-public Rank AnalyzeUnitTesting()
+public Rank AnalyzeAssertion(FactsType facts)
 {
+  /*
+    The following code is based on findings reported in 
+      Assessing the Relationship between Software Assertions and Code Quality:
+      An Empirical Investigation", Gunnar Kudrjavets, Nachiappan Nagappan,
+      Thomas Ball, Microsoft
+      http://research.microsoft.com/pubs/70290/tr-2006-54.pdf
+     
+    See also
+      http://research.microsoft.com/en-us/news/features/nagappan-100609.aspx
+
+
+    They observed a negative correlation: more assertions and code
+    verifications means fewer bugs.
+    In the paper assertion density is defined as 'number of assertions / KLOC'.
+    However, they don't present thresholds to base a ranking on for which
+    assertion density is suppost to be low, moderate or high.  
+     
+    The metric implemented in this function uses some 'common sense' values
+    for ranking the number of "assertions per method". Assertion density
+    is not used because we believe the number of assertions depends should be
+    per method and depending on the number of arguments (not implemented right
+    now).
+    Assertion density (per KLOC or method) is something that could/should be
+    researched more (thesis subject??).   
+
+    For all methods
+      calculate it's assertion density based on:
+		AD		Risk evaluation
+		0-0		very high risk
+		1-1		high risk
+		2-4		moderate risk
+		 >4		low risk
+		
+	  for each risk evaluation aggregate the number of lines
+	  as percentage to LOC
+ 
+  	Determine ranking based on:
+			maximum relative LOC
+	  rank	moderate	high	very high
+	  ++	25%			0%		0%
+	  +		30%			5%		0%
+	  o		40%			10%		0%
+	  -		50%			15%		5%
+	  --		-			-		-	  
+  */
+  risks = calcRiskLevels(
+    facts,
+    riskEvaluation(0, 1, 4),
+    bool (MethodInfoType m, int boundary) {
+      return (m.assertCount <= boundary);
+    }
+  ); 
+  /*debug*/ debug("== AnalyzeAssertion: risks = <risks>");
+
+  Footprint fp = footprint(
+    <25,  0, 0>,
+    <30,  5, 0>,
+    <40, 10, 0>,
+    <50, 15, 5>
+  );
+  return calcRating(risks, fp);
 }

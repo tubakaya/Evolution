@@ -11,6 +11,9 @@ import FactsType;
 import FactExtractors::ExtractorCommon;
 
 
+/*
+  Get information about all method in project. 
+*/
 public list[MethodInfoType] ExtractMethodInfo(loc project, str ext)
 {
   /*debug*/ debug("extracting method info...");
@@ -41,63 +44,23 @@ public list[MethodInfoType] ExtractMethodInfo(loc project, str ext)
       result += MethodInfo(
   	              method@\loc,
   	              size(GetCodeLines(method@\loc)),
-  	              CyclomaticComplexity(method)
+  	              CyclomaticComplexity(method),
+  	              CountAssertion(method)
   	            );
     }
   }
   
-  debug("done extracting method info..."); 
+  /*debug*/ debug("done extracting method info...");
    
   return result;
 }
-
-/*
-public list[MethodInfoType] ExtractMethodInfo(loc project, str ext)
-{
-  list[loc] allFiles = GetAllFiles(project, ext);
-  
-  int totalFiles = size(allFiles);
-  debug("total files = <totalFiles>");
-  
-  debug("extracting methods...");
-  int i = 1;
-  //TODO: use a list 
-  set[MethodDec] methods = {};
-  //TODO: use append
-  for(f <- allFiles) {
-    debug("\t<i>/<totalFiles>: <f>"); i = i + 1;
-    
-    methods += {m | /MethodDec m := parse(#start[CompilationUnit], f)};
-  }
-  
-  int totalMethods = size(methods);
-  debug("total methods = <totalMethods>");
-
-  debug("getting method info...");
-  i = 1;
-  list[MethodInfoType] result = [];
-  //TODO: us append
-  for(method <- methods) {
-    debug("\t<i>/<totalMethods>: <method@\loc>"); i = i + 1;
-    
-    result += MethodInfo(
-  	            method@\loc,
-  	            size(GetCodeLines(method@\loc)),
-  	            CyclomaticComplexity(method)
-  	          );
-  }
-  
-  debug("done extracting method info..."); 
-   
-  return result;
-}
-*/
 
 /*
   Calculate CyclomaticComplexity: from http://www.rascal-mpl.org/#_Metrics
 */
 int CyclomaticComplexity(MethodDec m) {
   result = 1;
+  //TODO: it is not counting the ternary operator: `<expr> ? <expr> : <expr>;`
   visit (m) {
     case (Stm)`do <Stm _> while (<Expr _>);`: result += 1;
     case (Stm)`while (<Expr _>) <Stm _>`: result += 1;
@@ -109,6 +72,18 @@ int CyclomaticComplexity(MethodDec m) {
     case (Stm)`switch (<Expr _> ) <SwitchBlock _>`: result += 1;
     case (SwitchLabel)`case <Expr _> :` : result += 1;
     case (CatchClause)`catch (<FormalParam _>) <Block _>` : result += 1;
+  }
+  return result;
+}
+
+/*
+  Count assert statements
+*/
+int CountAssertion(MethodDec m) {
+  result = 0;
+  visit (m) {
+    case (Stm)`assert <Expr _> ;`: result += 1;
+    case (Stm)`assert <Expr _> : <Expr _> ;`: result += 1;
   }
   return result;
 }

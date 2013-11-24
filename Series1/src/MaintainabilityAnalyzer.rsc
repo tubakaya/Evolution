@@ -5,10 +5,8 @@ import FactsAnalyzer;
 import Ranking;
 import Utils;
 import FactExtractors::MethodInfoExtractor;
-import FactExtractors::ComplexityExtractor;
 import FactExtractors::DuplicationCountExtractor;
 import FactExtractors::TotalLOCExtractor;
-import FactExtractors::UnitSizeExtractor;
 
 /*
   First extract all facts from the source code by the ExtractXXX functions.
@@ -29,6 +27,7 @@ public map[str, Rank] AnalyzeMaintainability(loc project, str ext)
     , "Complexity": AnalyzeComplexity(facts)
     , "Duplication": AnalyzeDuplication(facts)
     , "Unit size": AnalyzeUnitSize(facts)
+    , "Assertion": AnalyzeAssertion(facts)
   );
   
   return result;

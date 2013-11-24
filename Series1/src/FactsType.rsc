@@ -1,6 +1,11 @@
 module FactsType
 
-data MethodInfoType = MethodInfo(loc method, int LOC, int complexity);
+data MethodInfoType = MethodInfo(
+  loc method,
+  int LOC,
+  int complexity,
+  int assertCount
+);
 
 data FactsType = Facts(
   loc project,
