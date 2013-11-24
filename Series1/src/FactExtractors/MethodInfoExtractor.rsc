@@ -4,6 +4,8 @@ module FactExtractors::MethodInfoExtractor
 import lang::java::\syntax::Java15;
 import ParseTree;
 import List;
+import Set;
+import Utils;
 
 import FactsType;
 import FactExtractors::ExtractorCommon;
@@ -12,21 +14,37 @@ import FactExtractors::ExtractorCommon;
 public list[MethodInfoType] ExtractMethodInfo(loc project, str ext)
 {
   list[loc] allFiles = GetAllFiles(project, ext);
+  
+  int totalFiles = size(allFiles);
+  debug("total files = <totalFiles>");
+  
+  debug("extracting methods...");
+  int i = 1;
   set[MethodDec] methods = {};
-  for(f <- allFiles)
-  {
-  	methods += {m | /MethodDec m := parse(#start[CompilationUnit], f)};
+  for(f <- allFiles) {
+    debug("\t<i>/<totalFiles>: <f>"); i = i + 1;
+    
+    	methods += {m | /MethodDec m := parse(#start[CompilationUnit], f)};
   }
+  
+  int totalMethods = size(methods);
+  debug("total methods = <totalMethods>");
 
+  debug("getting method info...");
+  i = 1;
   list[MethodInfoType] result = [];
   for(method <- methods) {
-  	result += MethodInfo(
-  	            method@\loc,
-  	            size(GetCodeLines(method@\loc)),
-  	            CyclomaticComplexity(method)
-  	          );
-  }
+    debug("\t<i>/<totalMethods>: <method@\loc>"); i = i + 1;
     
+    	result += MethodInfo(
+  	              method@\loc,
+  	              size(GetCodeLines(method@\loc)),
+  	              CyclomaticComplexity(method)
+  	            );
+  }
+  
+  debug("done extracting method info..."); 
+   
   return result;
 }
 

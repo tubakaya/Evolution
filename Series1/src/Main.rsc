@@ -8,6 +8,7 @@ public map[str, Rank] Main()
 {
   loc project = |project://TestJ|;
   //loc project = |project://SmallSql|;
+  //loc project = |project://QLJava|;
   str projectType = "java";
 
   result = AnalyzeMaintainability(project, projectType);
