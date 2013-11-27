@@ -11,8 +11,8 @@ import util::Benchmark;
 
 public map[str, Rank] Main()
 {
-  loc project = |project://TestJ|;
-  //loc project = |project://SmallSql|;
+  //loc project = |project://TestJ|;
+  loc project = |project://SmallSql|;
   str projectType = "java";
 
   map[str, Rank] result;

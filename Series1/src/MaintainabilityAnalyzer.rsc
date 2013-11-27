@@ -7,10 +7,10 @@ import FactsType;
 import FactsAnalyzer;
 import Ranking;
 import Utils;
+import FactExtractors::ExtractorCommon;
 import FactExtractors::MethodInfoExtractor;
 import FactExtractors::DuplicationCountExtractor;
 import FactExtractors::TotalLOCExtractor;
-import util::FileSystem;
 
 /*
   First extract all facts from the source code by the ExtractXXX functions.
@@ -19,13 +19,12 @@ import util::FileSystem;
 */
 public map[str, Rank] AnalyzeMaintainability(loc project, str ext)
 {
-  list[loc] allFiles = GetAllFiles(project,ext);
-  
   // extract all facts from source code
   FactsType facts = Facts(project, ext, [], 0, 0);
+  list[loc] allFiles = GetAllFiles(project,ext);
   facts.totalLOC = ExtractTotalLOC(allFiles);
   facts.methods = ExtractMethodInfo(project, allFiles);
-  facts.duplicateCount = ExtractDuplicateCount(allFiles);
+  //facts.duplicateCount = ExtractDuplicateCount(allFiles);
 
   // analyze facts  
   result = (
@@ -37,9 +36,4 @@ public map[str, Rank] AnalyzeMaintainability(loc project, str ext)
   );
   
   return result;
-}
-
-public list[loc] GetAllFiles(loc project, str ext)
-{
-   return [f | /file(f) <- crawl(project), f.extension == ext];
 }

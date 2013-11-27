@@ -17,3 +17,9 @@ public list[str] GetCodeLines(loc location)
                                         , !startsWith(trim(l),"*")
                                         , !endsWith(trim(l),"*/")];
 }
+
+public list[loc] GetAllFiles(loc project, str ext)
+{
+   // skip all files containing 'junit' in location
+   return [f | /file(f) <- crawl(project), f.extension == ext, !(/junit/ := f.path)];
+}
