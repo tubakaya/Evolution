@@ -38,6 +38,7 @@ list[block] GetAllPossibleLineBlocksOfSize6(loc file)
 
 map[block, loc] GetDuplicates(map[block, loc] blockList)
 {
+	map[block, loc] duplicates=();
     map[block, loc] otherBlocks = blockList;
     int i = 1;
     for(b <- blockList)
@@ -66,15 +67,20 @@ map[block, loc] GetDuplicates(map[block, loc] blockList)
 int GetDuplicateLinesCount(map[block, loc] duplicateBlocks)
 {
 	int totalLines = size(duplicateBlocks) * 6;
-		
-	map[loc, block] reverseDuplicateBlocks = (f:b| b <- duplicateBlocks, f <- duplicateBlocks[b]);
+	map[list[block], loc] blocksPerFile=();
 	
-	int overlappingLines = 0;
-	for(f <- reverseDuplicateBlocks)
+	list[loc] files= toList(toSet([duplicateBlocks[b] | b <- duplicateBlocks]));
+	for(f <- files)
 	{
-		list[block] blocksInFile= [b|b <-reverseDuplicateBlocks[f]];
-		overlappingLines += (0 | it+ b.lineNumberStartsAt + 6 - b2.lineNumberStartsAt| b <- blocksInFile
-										, b2 <- blocksInFile
+		list[block] blocks = [b | b <- duplicateBlocks, duplicateBlocks[b] == f];
+		blocksPerFile +=(blocks:f);
+	}										   
+												
+	int overlappingLines = 0;
+	for(bs <- blocksPerFile)
+	{
+		overlappingLines += (0 | it+ b.lineNumberStartsAt + 6 - b2.lineNumberStartsAt| b <- bs
+										, b2 <- bs
 										, b2.lineNumberStartsAt > b.lineNumberStartsAt
 										, b2.lineNumberStartsAt < b.lineNumberStartsAt + 6 );
 	}
