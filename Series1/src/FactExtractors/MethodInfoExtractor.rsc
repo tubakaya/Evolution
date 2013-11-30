@@ -45,7 +45,7 @@ public list[MethodInfoType] ExtractMethodInfo(loc project, list[loc] allFiles)
     
       result += MethodInfo(
                         method@\loc,
-                        size(GetCodeLines(method@\loc)),
+                        GetLOC(method@\loc),
                         CyclomaticComplexity(method),
                         CountAssertion(method)
                       );

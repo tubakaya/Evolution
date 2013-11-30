@@ -9,19 +9,23 @@ import util::FileSystem;
 import Utils;
 import List;
 
+
+public int GetLOC(loc location)
+{
+  return size(GetCodeLines(location));
+}
+
+
 //TODO: Currently this function is called two times for every piece
 //      of source code:
 //        1) from ExtractTotalLOC() for all files
 //        2) from ExtractMethodInfo() for all methods
 //      Not optimal!! 
-//
-//TODO: Does it need to return all the file lines? Or just the count?
 public list[str] GetCodeLines(loc location)
 {
   list[str] allLines = readFileLines(location);
  
   list[str] result = [];
-  int count = 0;
   inComment = false;
   
   for(s <- allLines) {
@@ -45,7 +49,6 @@ public list[str] GetCodeLines(loc location)
       
     if (!isEmpty(s)) {
       result += s;
-      count += 1;
     }
   }
 
