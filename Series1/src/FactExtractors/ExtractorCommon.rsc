@@ -15,7 +15,6 @@ public int GetLOC(loc location)
   return size(GetCodeLines(location));
 }
 
-
 //TODO: Currently this function is called two times for every piece
 //      of source code:
 //        1) from ExtractTotalLOC() for all files
@@ -90,6 +89,9 @@ tuple[bool inComment, str s] removeComments(bool inComment, str line) {
 
 public list[loc] GetAllFiles(loc project, str ext)
 {
+   /*debug*/ debug("getting all files...");
+   /*debug*/ debug("\tproject = <project>");
+
    // skip all files containing 'junit' in location
    return [f | /file(f) <- crawl(project), f.extension == ext, /junit/ !:= f.path];
 }
