@@ -1,5 +1,5 @@
 @contributor{Sander Leer - Sander.Leer@gmail.com}
-@contributor{Tuba Kaya Chomette - admin@tubakaya.com}
+@contributor{Tuba Kaya Chomette - tuba_kaya@outlook.com}
 
 module MaintainabilityAnalyzer
 
@@ -24,7 +24,7 @@ public map[str, Rank] AnalyzeMaintainability(loc project, str ext)
   list[loc] allFiles = GetAllFiles(project,ext);
   facts.totalLOC = ExtractTotalLOC(allFiles);
   facts.methods = ExtractMethodInfo(project, allFiles);
-  //facts.duplicateCount = ExtractDuplicateCount(allFiles);
+  facts.duplicateCount = ExtractDuplicateCount(allFiles);
 
   // analyze facts  
   result = (
