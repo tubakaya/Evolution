@@ -90,6 +90,9 @@ tuple[bool inComment, str s] removeComments(bool inComment, str line) {
 
 public list[loc] GetAllFiles(loc project, str ext)
 {
-   // skip all files containing 'junit' in location
-   return [f | /file(f) <- crawl(project), f.extension == ext, /junit/ !:= f.path];
+  /*debug*/ debug("getting all files...");
+  /*debug*/ debug("\tproject = <project>");
+
+  // skip all files containing 'junit' in location
+  return [f | /file(f) <- crawl(project), f.extension == ext, /junit/ !:= f.path];
 }
