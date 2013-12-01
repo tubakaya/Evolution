@@ -13,7 +13,7 @@ public void debug(value arg) {
 }
 
 public int percentage(num part, num total) {
-  assert total != 0 : "total must be non-zero"; 
+  //assert total != 0 : "total must be non-zero"; 
 
   return round((part / toReal(total)) * 100);
 }

@@ -9,7 +9,7 @@ import Ranking;
 import Utils;
 import FactExtractors::ExtractorCommon;
 import FactExtractors::MethodInfoExtractor;
-import FactExtractors::DuplicationCountExtractor;
+import FactExtractors::ClonesExtractor;
 import FactExtractors::TotalLOCExtractor;
 
 /*
