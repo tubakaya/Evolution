@@ -41,10 +41,49 @@ map[block, loc] GetDuplicates(map[block, loc] blockList)
 	map[block, loc] duplicates=();
     map[block, loc] otherBlocks = blockList;
     int i = 1;
+    /* for debugging only */ int blockListSize = size(blockList);
     for(b <- blockList)
     { 
        otherBlocks = delete(otherBlocks, b);
        int j = 1;
+
+       //TODO: I think this loop can be removed and use the lookup function
+       //      of maps (lookup on key value).
+       //      That's the whole idea of using maps, right?
+       //      Because now it still performs O(n) instead of O(1).
+       //
+       //      Just see that the datastructure used is:
+       //        map[<list[str] lines, int lineNumberStartsAt>, loc location]
+       //
+       //      I think this should be:
+       //        map[list[str] lines, <int lineNumberStartsAt, loc location>]
+       //      So the key of the map is not a tuple, but the 'extra data' is in
+       //      the tuple. This makes coomparing and lookup in the map faster.
+       //
+       //      Next, just using a string as key makes it (possible) also faster
+       //      for lookup (instead of using a list[str] as key).
+       //      So the final datastructure would be like this:
+       //        map[str lines, <int lineNumberStartsAt>, loc location>]
+       //
+       //      Just combine the list of strings of a block as 1 string (by
+       //      using the toString() function on lists, or write your own
+       //      function str join(list[str]) which concatenates all strings in
+       //      the list).
+       //
+       //      After these changes a lookup can be done in O(1) like this:
+       //        if (b in otherBlocks) { ... }
+       //      or, if you know the ket exists, you can use
+       //        value = otherBlocks[b]
+       //      If the key not exists you get an error/exception.
+       //      After 'value' contains the tuple with 'extra data' like
+       //      lineNumberStartsAt and location  
+       /*
+               debug("checking block <i> / <blockListSize>");
+               if (b in otherBlocks) {
+                 debug("\tDUPLICATE FOUND");
+               }
+       */
+       
        for(ob <- otherBlocks)
        {
        	   debug("\tchecking method <i> / <j>"); 
