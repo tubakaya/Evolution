@@ -93,16 +93,16 @@ When running the program on the `hsqldb-2.3.1` project, these are the findings:
 
 **Program output**
 
-    == AnalyzeComplexity: risks = riskLevels(riskLevel(75485,53),riskLevel(17167,12),riskLevel(13362,9),riskLevel(10796,26))
-    == AnalyzeUnitSize: risks = riskLevels(riskLevel(27216,19),riskLevel(67957,48),riskLevel(10960,8),riskLevel(10677,25))
-    == AnalyzeAssertion: risks = riskLevels(riskLevel(114602,80),riskLevel(1149,1),riskLevel(1059,1),riskLevel(0,18))
-    == total time: 2998.139 seconds
-    
+    == AnalyzeComplexity: risks = riskLevels(riskLevel(64651,50),riskLevel(16370,13),riskLevel(12518,10),riskLevel(10796,27))
+    == AnalyzeUnitSize: risks = riskLevels(riskLevel(25757,20),riskLevel(58562,46),riskLevel(9866,8),riskLevel(10150,26))
+    == AnalyzeAssertion: risks = riskLevels(riskLevel(102127,79),riskLevel(1149,1),riskLevel(1059,1),riskLevel(0,19))
+    == total time: 1765.819 seconds
+
     map[str, Rank]: (
       "Duplication":VeryLow(26),
       "Complexity":VeryLow(0),
       "Unit size":VeryLow(0),
-      "Volume":High(142),
+      "Volume":High(128),
       "Assertion":VeryLow(0)
     )
 
