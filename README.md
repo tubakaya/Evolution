@@ -43,15 +43,7 @@ Calculate number of assert statements
 
 ## Program structure
 
-1. Read the Java project using `myModel = createM3FromEclipseProject(…)`
--  Call
-  `extractVolume(…)`
-  `extractComplexity(…)`
-  `extractDuplication(…)` 
-  `extractUnitSize(…)`
-  `extractUnitTesting(…)`
-- Calculate ranking per metric
-- Display the metrics
+<TODO\>
 
 ## Questions
 1. Why is using `import lang::java::\syntax::Java15;` making Rascal go NUTS (performance wise)!! Because it is generating a parser every time this import unit is used?
