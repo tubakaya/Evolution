@@ -1,4 +1,8 @@
+@contributor{Sander Leer - Sander.Leer@gmail.com}
+@contributor{Tuba Kaya Chomette - tuba_kaya@outlook.com}
+
 module FactExtractors::ClonesExtractor
+
 import FactExtractors::ExtractorCommon;
 import Set;
 import List;
