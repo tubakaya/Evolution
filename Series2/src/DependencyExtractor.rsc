@@ -12,27 +12,31 @@ public DependencyInfo ExtractPackageLevelDependencyInfo(M3 m3Model)
 										, p.path != "/"}; 
 	rel[loc from, loc to] dependencies = m3Model@typeDependency;
 	
-	map[str package, int totalDependencies] packageDependencies = ();	
-	rel[loc from, loc to] result = {};
+	rel[loc fromPackage, loc toPackage, int dependencyCount] packageDependencies = {};	
 	
-	for(n <- packageNames)
+	for(n1 <- packageNames)
 	{
-		int counter = 0;
-		for(e <- dependencies)
-		{			
-			if(isCompilationUnit(e.from)
-				,contains(e.from.path, n)
-				,isClass(e.to)
-				,!startsWith(e.to.path,"/java/"))
+		for(n2 <- packageNames)
+		{
+			if(n1 != n2)
 			{
-				result += e;
-				counter += 1;
+				int counter = 0;
+				for(e <- dependencies)
+				{			
+					if(contains(e.from.path, n1)
+						,contains(e.to.path, n2)
+						,isClass(e.to)
+						,!startsWith(e.to.path,"/java/"))
+					{
+						counter += 1;
+					}
+				}
+				packageDependencies += (<n1, n2, counter>);
 			}
 		}
-		packageDependencies += (n:counter);
 	}
 
-	return PackageLevelDependencyInfo(packageDependencies, result);
+	return PackageLevelDependencyInfo(packageDependencies);
 }
 
 public DependencyInfo ExtractClassLevelDependencyInfo(rel[loc from, loc to] dependencies)
