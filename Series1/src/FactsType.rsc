@@ -4,7 +4,7 @@
 module FactsType
 
 data MethodInfoType = MethodInfo(
-  loc method,
+  loc method, //TODO: rename to location?
   int LOC,
   int complexity,
   int assertCount

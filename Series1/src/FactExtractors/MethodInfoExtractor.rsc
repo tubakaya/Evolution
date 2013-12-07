@@ -33,8 +33,9 @@ public list[MethodInfoType] ExtractMethodInfo(loc project, list[loc] allFiles)
     /*debug*/ debug("\t<i>/<totalFiles>: <f>");
     /*debug*/ i = i + 1;
     
-    methods = {m | /MethodDec m := parse(#start[CompilationUnit], f)};
-
+    tree = parse(#start[CompilationUnit], f);
+    methods = {m | /MethodDec m := tree};
+    
     /*debug*/ int totalMethods = size(methods);
     /*debug*/ debug("\t\ttotal methods = <totalMethods>");
     /*debug*/ int j = 1;
