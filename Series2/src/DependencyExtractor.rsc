@@ -1,39 +1,35 @@
 module DependencyExtractor
 
 import lang::java::m3::Core;
+import lang::java::jdt::m3::Core;
 import Types;
 import String;
+import Utils;
 
 public DependencyInfo ExtractPackageLevelDependencyInfo(M3 m3Model)
 {
-	set[loc] packages = packages(m3Model);
-	set[str] packageNames = {p.path | p <- packages
-										, !isEmpty(trim(p.path))
-										, p.path != "/"}; 
-	rel[loc from, loc to] dependencies = m3Model@typeDependency;
+	set[loc] packages = {e | e <- m3Model@containment<from>
+								, isPackage(e)
+								, trim(e.path)!="/"};
+								
+	rel[loc from, loc to] dependencies = {r | r <- m3Model@typeDependency
+											, p <- packages
+											, startsWith(r.from.path, p.path) || startsWith(r.to.path, p.path)};
 	
 	rel[loc fromPackage, loc toPackage, int dependencyCount] packageDependencies = {};	
 	
-	for(n1 <- packageNames)
+	for(n1 <- packages, n2 <- packages,n1 != n2)
 	{
-		for(n2 <- packageNames)
-		{
-			if(n1 != n2)
+		int counter = 0;
+		for(e <- dependencies)
+		{		
+			if(contains(e.from.path, n1.path)
+				,contains(e.to.path, n2.path))
 			{
-				int counter = 0;
-				for(e <- dependencies)
-				{			
-					if(contains(e.from.path, n1)
-						,contains(e.to.path, n2)
-						,isClass(e.to)
-						,!startsWith(e.to.path,"/java/"))
-					{
-						counter += 1;
-					}
-				}
-				packageDependencies += (<n1, n2, counter>);
+				counter += 1;						
 			}
 		}
+		packageDependencies += (<n1, n2, counter>);
 	}
 
 	return PackageLevelDependencyInfo(packageDependencies);
@@ -47,6 +43,6 @@ public DependencyInfo ExtractClassLevelDependencyInfo(rel[loc from, loc to] depe
 
 public rel[loc from, loc to] GetM3(loc project)
 {
-	M3 m3Model = createM3FromDirectory(project);
+	M3 m3Model = createM3FromEclipseProject(project);
 	return m3Model@typeDependency;	
 }
