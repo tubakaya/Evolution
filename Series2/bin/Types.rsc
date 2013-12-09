@@ -5,7 +5,7 @@ import FactsType;
 
 //TODO: needed for visualization
 data DependencyInfo = 
-	PackageLevelDependencyInfo(map[str package, int totalDependencies], rel[loc from, loc to] classDependencies)
+	PackageLevelDependencyInfo(rel[loc fromPackage, loc toPackage, int dependencyCount])
 	| ClassLevelDependencyInfo(rel[loc from, loc to] classDependencies)
 	| MethodLevelDependencyInfo(rel[loc from, loc to] classDependencies); 
 
