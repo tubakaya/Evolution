@@ -7,13 +7,12 @@ import String;
 import Utils;
 import Set;
 import Ranking;
+import FactExtractors::ExtractorCommon;
 
 public VisualizationData ExtractClassDependencies(loc project)
 {
 	M3 m3Model = createM3FromEclipseProject(project);
-	set[str] packages = {e.path | e <- m3Model@containment<from>
-								, isPackage(e)
-								, trim(e.path)!="/"};
+	set[str] packages = GetAllPackageNames(m3Model);
 	
 	rel[loc from, loc to] dependencies = {r | r <- m3Model@typeDependency
 											, InPackages(r.from, packages)
@@ -24,7 +23,7 @@ public VisualizationData ExtractClassDependencies(loc project)
 								
 	list[ClassInfo] classInfos = [ClassInfo(d.from
 											,d.from.path
-											,50
+											,GetLOC(d.from)
 											,Low(5)
 											,(d.to : classToClassDependencies[d]))
 											| d <- classToClassDependencies];
@@ -33,13 +32,20 @@ public VisualizationData ExtractClassDependencies(loc project)
 	set[loc] classesAlreadyFound = {c.location |c <- classInfos};
 	classInfos += [ClassInfo(c
 							,c.path
-							,50
+							,GetLOC(c)
 							,Low(5)
 							,())
 							|c <- allClasses
 							,c notin classesAlreadyFound ];	
 															
 	return VisualizationData(classInfos);
+}
+
+private set[str] GetAllPackageNames(M3 m3Model)
+{
+	return {e.path | e <- m3Model@containment<from>
+						, isPackage(e)
+						, trim(e.path)!="/"};
 }
 
 private bool InPackages(loc file, set[str] packages)
