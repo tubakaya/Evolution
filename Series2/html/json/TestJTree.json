@@ -1,0 +1,61 @@
+{
+  "name": "Main",
+  "params": {
+    "location": "java+class:///testj/Main",
+    "LOC": 32,
+    "CC": "Low"
+  },
+  "children": [
+    {
+      "name": "Extra",
+      "params": {
+        "location": "java+class:///testj/Extra",
+        "LOC": 89,
+        "CC": "High",
+        "dependencyCount": 2
+      },
+      "children": []
+    },
+    {
+      "name": "Extra2",
+      "params": {
+        "location": "java+class:///testj/Extra2",
+        "LOC": 10,
+        "CC": "High",
+        "dependencyCount": 7
+      },
+      "children": []
+    },
+    {
+      "name": "Extra3",
+      "params": {
+        "location": "java+class:///testj/Extra3",
+        "LOC": 10,
+        "CC": "High",
+        "dependencyCount": 3
+      },
+      "children": [
+        {
+          "name": "Extra4",
+          "params": {
+            "location": "java+class:///testj/Extra4",
+            "LOC": 10,
+            "CC": "High",
+            "dependencyCount": 4
+          },
+          "children": []
+        },
+        {
+          "name": "Extra5",
+          "params": {
+            "location": "java+class:///testj/Extra5",
+            "LOC": 10,
+            "CC": "High",
+            "dependencyCount": 1
+          },
+          "children": []
+        }
+      ]
+    }
+  ]
+}
