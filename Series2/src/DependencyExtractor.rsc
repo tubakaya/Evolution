@@ -1,16 +1,22 @@
 module DependencyExtractor
 
+import Types;
+//import CCAnalyzer;
+
 import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
-import Types;
-import String;
-import Set;
-import Ranking;
-import FactExtractors::ExtractorCommon;
-import List;
 
-public VisualizationData ExtractClassDependencies(loc project)
+import String;
+import List;
+import Set;
+
+import FactExtractors::ExtractorCommon;
+import FactExtractors::MethodInfoExtractor;
+import Ranking;
+
+public VisualizationData ExtractClassDependencies(loc projectLoc)
 {
+	project = projectLoc;
 	M3 m3Model = createM3FromEclipseProject(project);
 	set[str] packages = GetAllPackageNames(m3Model);
 	
@@ -26,7 +32,8 @@ public VisualizationData ExtractClassDependencies(loc project)
 	set[loc] allClasses = classes(m3Model);
 	set[loc] classesAlreadyFound = {c.location |c <- classInfos};	
 	classInfos += GetIndependentClassInfos(allClasses, classesAlreadyFound);
-															
+	
+	classInfos = MakeLocsPhysical(project, m3Model,	classInfos);										
 	return VisualizationData(classInfos);
 }
 
@@ -76,12 +83,14 @@ private map[tuple[loc from, loc to] dep, int count] GetClassToClassDependencies(
 	
 	return classToClassDependencies;
 }
+
 private list[ClassInfo] GetDependentClassInfos(map[tuple[loc from, loc to] dep, int count] classToClassDependencies)
 {
 	list[ClassInfo] classInfos = [];
 	set[loc] froms = {c.from | c <- classToClassDependencies};
+
 	for(f <- froms)
-	{
+	{	
 		ClassInfo ci = ClassInfo(f
 								,f.path
 								,GetLOC(f)
@@ -99,11 +108,45 @@ private list[ClassInfo] GetDependentClassInfos(map[tuple[loc from, loc to] dep, 
 
 private list[ClassInfo] GetIndependentClassInfos(set[loc] allClasses, set[loc] classesAlreadyFound)
 {
-	return [ClassInfo(c
-							,c.path
-							,GetLOC(c)
-							,Low(5)
-							,())
-							|c <- allClasses
-							,c notin classesAlreadyFound ];	
+	return 	[ClassInfo(c
+						,c.path
+						,GetLOC(c)
+						,Low(5)
+						,())
+						|c <- allClasses
+						,c notin classesAlreadyFound];	
+}
+private list[ClassInfo] MakeLocsPhysical(loc project,M3 m3Model, list[ClassInfo] classInfos)
+{
+	set[loc] compilationUnits = files(m3Model@containment);
+	list[ClassInfo] toReturn = [];
+	for(c <- classInfos)
+	{
+		ClassInfo ci = c;
+		for(cu <- compilationUnits)
+		{
+			if(contains(cu.path, c.location.path))
+			{
+				ci.location = project + cu.path;
+				break;
+			}
+		}
+		
+		for(d <- c.dependencies)
+		{
+			for(cu <- compilationUnits)
+			{
+				if(contains(cu.path, d.path))
+				{
+					int count = c.dependencies[d];
+					ci.dependencies -= (d:count);
+					ci.dependencies +=  (project + cu.path : count);
+					break;
+				}
+			}
+		}
+		toReturn += ci;
+	}
+	
+	return toReturn;
 }
