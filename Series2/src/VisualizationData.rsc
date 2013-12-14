@@ -16,8 +16,8 @@ import DependencyExtractor;
 
 
 public void writeFacts() {
-  //loc project = |project://TestJ|;
-  loc project = |project://SmallSql|;
+  loc project = |project://TestJ|;
+  //loc project = |project://SmallSql|;
   //loc project = |project://hsqldb|;
 
   // extract all facts from source code
@@ -40,6 +40,7 @@ str getInfo(map[str,str] parameters) {
 
 str showLocation(map[str,str] parameters) {
   edit(|project://TestJ/src/Extra.java|(1162,175,<49,1>,<57,2>));
+  //edit(|java+class:///smallsql/database/ExpressionFunctionRound|);
   return getInfo();
 }
 
