@@ -4,35 +4,26 @@
 module VisualizationData
 
 import IO;
+import DateTime;
 import lang::json::IO;
 //import lang::html5::DOM;
 import util::Editors;
-import DateTime;
+import util::Webserver;
 
-import FactsType;
-import FactExtractors::ExtractorCommon;
-import FactExtractors::MethodInfoExtractor;
-import FactExtractors::TotalLOCExtractor;
 import Utils;
 import Types;
-
-import util::Webserver;
+import DependencyExtractor;
 
 
 public void writeFacts() {
-  loc project = |project://TestJ|;
-  //loc project = |project://SmallSql|;
+  //loc project = |project://TestJ|;
+  loc project = |project://SmallSql|;
   //loc project = |project://hsqldb|;
-  str ext = "java";
 
   // extract all facts from source code
-  FactsType facts = Facts(project, ext, [], 0, 0);
-  list[loc] allFiles = GetAllFiles(project,ext);
-  facts.totalLOC = ExtractTotalLOC(allFiles);
-  facts.methods = ExtractMethodInfo(project, allFiles);
+  facts = ExtractClassDependencies(project);
   
   loc file = |home:///Desktop/tempFacts.txt|;
-
   writeTextJSonFile(file, facts); 
 }
 
