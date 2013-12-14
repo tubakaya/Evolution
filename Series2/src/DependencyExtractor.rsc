@@ -4,10 +4,10 @@ import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
 import Types;
 import String;
-import Utils;
 import Set;
 import Ranking;
 import FactExtractors::ExtractorCommon;
+import List;
 
 public VisualizationData ExtractClassDependencies(loc project)
 {
@@ -21,22 +21,11 @@ public VisualizationData ExtractClassDependencies(loc project)
 	map[tuple[loc from, loc to] dep, int count] classToClassDependencies
 						= GetClassToClassDependencies(m3Model, dependencies);
 								
-	list[ClassInfo] classInfos = [ClassInfo(d.from
-											,d.from.path
-											,GetLOC(d.from)
-											,Low(5)
-											,(d.to : classToClassDependencies[d]))
-											| d <- classToClassDependencies];
+	list[ClassInfo] classInfos = GetDependentClassInfos(classToClassDependencies);
 	
 	set[loc] allClasses = classes(m3Model);
-	set[loc] classesAlreadyFound = {c.location |c <- classInfos};
-	classInfos += [ClassInfo(c
-							,c.path
-							,GetLOC(c)
-							,Low(5)
-							,())
-							|c <- allClasses
-							,c notin classesAlreadyFound ];	
+	set[loc] classesAlreadyFound = {c.location |c <- classInfos};	
+	classInfos += GetIndependentClassInfos(allClasses, classesAlreadyFound);
 															
 	return VisualizationData(classInfos);
 }
@@ -61,6 +50,7 @@ private bool InPackages(loc file, set[str] packages)
 	}
 	return result;
 }
+
 private map[tuple[loc from, loc to] dep, int count] GetClassToClassDependencies(M3 m3Model,rel[loc from, loc to] dependencies )
 {
 	map[tuple[loc from, loc to] dep, int count] classToClassDependencies = ();									
@@ -68,19 +58,52 @@ private map[tuple[loc from, loc to] dep, int count] GetClassToClassDependencies(
 	{
 		while(!isClass(d.from))
 		{
-			debug("\tfrom:<d.from>");	
-			d.from = [e.from |e <- m3Model@containment, e.to == d.from][0];	
-			debug("\tfrom after:<d.from>");			
+			d.from = [e.from |e <- m3Model@containment, e.to == d.from][0];			
 		}
-		if(<d.from, d.to> in classToClassDependencies)
+		
+		if(d.from!=d.to)
 		{
-			classToClassDependencies[<d.from,d.to>] += 1;
-		}
-		else
-		{
-			classToClassDependencies += (<d.from, d.to> : 1);
+			if(<d.from, d.to> in classToClassDependencies)
+			{
+				classToClassDependencies[<d.from,d.to>] += 1;
+			}
+			else
+			{
+				classToClassDependencies += (<d.from, d.to> : 1);
+			}
 		}
 	}
 	
 	return classToClassDependencies;
+}
+private list[ClassInfo] GetDependentClassInfos(map[tuple[loc from, loc to] dep, int count] classToClassDependencies)
+{
+	list[ClassInfo] classInfos = [];
+	set[loc] froms = {c.from | c <- classToClassDependencies};
+	for(f <- froms)
+	{
+		ClassInfo ci = ClassInfo(f
+								,f.path
+								,GetLOC(f)
+								,Low(5)
+								,());
+		
+		map[loc to, int count] dep = (c.to : classToClassDependencies[c] 
+												| c <- classToClassDependencies
+												, c.from == f);
+		ci.dependencies = dep;
+		classInfos += ci;
+	}	
+	return classInfos;
+}
+
+private list[ClassInfo] GetIndependentClassInfos(set[loc] allClasses, set[loc] classesAlreadyFound)
+{
+	return [ClassInfo(c
+							,c.path
+							,GetLOC(c)
+							,Low(5)
+							,())
+							|c <- allClasses
+							,c notin classesAlreadyFound ];	
 }
