@@ -1,13 +1,24 @@
 module Types
 
 import Ranking;
-import FactsType;
+
+data MethodInfo = MethodInfo(
+  loc location,
+  int LOC,
+  int complexity
+);
+
+data ClassFacts = ClassFacts(
+  loc location,
+  list[MethodInfo] methods,
+  int totalLOC
+);
 
 data ClassInfo = ClassInfo(
   loc location,
   str name,
   int LOC,
-  Rank CC,
+  int CC,
   map[loc depOn, int count] dependencies
 );
 

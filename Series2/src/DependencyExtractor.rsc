@@ -94,7 +94,7 @@ private list[ClassInfo] GetDependentClassInfos(map[tuple[loc from, loc to] dep, 
 		ClassInfo ci = ClassInfo(f
 								,f.path
 								,GetLOC(f)
-								,Low(5)
+								,1
 								,());
 		
 		map[loc to, int count] dep = (c.to : classToClassDependencies[c] 
@@ -111,11 +111,12 @@ private list[ClassInfo] GetIndependentClassInfos(set[loc] allClasses, set[loc] c
 	return 	[ClassInfo(c
 						,c.path
 						,GetLOC(c)
-						,Low(5)
+						,1
 						,())
 						|c <- allClasses
 						,c notin classesAlreadyFound];	
 }
+
 private list[ClassInfo] MakeLocsPhysical(loc project,M3 m3Model, list[ClassInfo] classInfos)
 {
 	set[loc] compilationUnits = files(m3Model@containment);
