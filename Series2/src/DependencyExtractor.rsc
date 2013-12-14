@@ -5,44 +5,58 @@ import lang::java::jdt::m3::Core;
 import Types;
 import String;
 import Utils;
+import Set;
+import Ranking;
 
-public DependencyInfo ExtractPackageLevelDependencyInfo(M3 m3Model)
-{
-	set[loc] packages = {e | e <- m3Model@containment<from>
-								, isPackage(e)
-								, trim(e.path)!="/"};
-								
-	rel[loc from, loc to] dependencies = {r | r <- m3Model@typeDependency
-											, p <- packages
-											, startsWith(r.from.path, p.path) || startsWith(r.to.path, p.path)};
-	
-	rel[loc fromPackage, loc toPackage, int dependencyCount] packageDependencies = {};	
-	
-	for(n1 <- packages, n2 <- packages,n1 != n2)
-	{
-		int counter = 0;
-		for(e <- dependencies)
-		{		
-			if(contains(e.from.path, n1.path)
-				,contains(e.to.path, n2.path))
-			{
-				counter += 1;						
-			}
-		}
-		packageDependencies += (<n1, n2, counter>);
-	}
-
-	return PackageLevelDependencyInfo(packageDependencies);
-}
-
-public DependencyInfo ExtractClassLevelDependencyInfo(rel[loc from, loc to] dependencies)
-{
-	rel[loc from, loc to] result = {e | e <- dependencies, isClass(e.to), startsWith(e.to.path,"/java/") == false};
-	return ClassLevelDependencyInfo(result);
-}
-
-public rel[loc from, loc to] GetM3(loc project)
+public list[ClassInfo] ExtractClassDependencies(loc project)
 {
 	M3 m3Model = createM3FromEclipseProject(project);
-	return m3Model@typeDependency;	
+	set[str] packages = {e.path | e <- m3Model@containment<from>
+								, isPackage(e)
+								, trim(e.path)!="/"};
+	
+	rel[loc from, loc to] dependencies = {r | r <- m3Model@typeDependency
+											, InPackages(r.from, packages)
+											, InPackages(r.to, packages)};
+	
+	map[tuple[loc from, loc to] dep, int count] classToClassDependencies = ();									
+	for(d <- dependencies)
+	{
+		while(!isClass(d.from))
+		{
+			debug("\tfrom:<d.from>");	
+			d.from = [e.from |e <- m3Model@containment, e.to == d.from][0];	
+			debug("\tfrom after:<d.from>");			
+		}
+		if(<d.from, d.to> in classToClassDependencies)
+		{
+			classToClassDependencies[<d.from,d.to>] += 1;
+		}
+		else
+		{
+			classToClassDependencies += (<d.from, d.to> : 1);
+		}
+	}
+								
+	list[ClassInfo] classInfos = [ClassInfo(d.from
+											,d.from.path
+											,50
+											,Low(5)
+											,(d.to : classToClassDependencies[d]))| d <- classToClassDependencies];
+											
+	return classInfos;
+}
+
+private bool InPackages(loc file, set[str] packages)
+{
+	bool result = false;
+	for(p <- packages)
+	{
+		if(startsWith(file.path,p))
+		{
+			result=true;
+			break;
+		}
+	}
+	return result;
 }
