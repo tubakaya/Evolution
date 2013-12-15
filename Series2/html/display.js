@@ -41,16 +41,16 @@ var constants = {
   colorLink: "#CCCCCC",
   
   // times (ms) for fade-in and -out
-  fadeIn: 800,
-  fadeOut: 400
+  fadeIn: 600,
+  fadeOut: 300,
+  
+  // factor which is used to 'brighten' the path when hovering over a node
+  brightnessFactor: .5
 }
 
 
 function loadFacts(filename) {
-  console.log("reading JSON file")
   d3.json(filename, function(error, data) {
-    console.log("JSON file readed")
-    console.log(data)
     createGraph(data)
     updateUI()
   })
@@ -101,8 +101,6 @@ function createGraph(treeData) {
 
 
 function getNodeID(d) {
-  console.log(d.name)
-  console.log(d)
   if (d.depth == 0) {
     return "rootnode"
   }
@@ -123,6 +121,7 @@ function getStrokeWidth(d) {
   return strokeWidth
 }
 
+//TODO: this function is only looking 1 level down!!
 function getMaxDependencyCount() {
   var rootNode = d3.select("#rootnode")[0][0].__data__
   var result = d3.max(rootNode.children.map(function(d) {
@@ -143,6 +142,7 @@ function getBoxGrowth(d) {
   return (d.params.LOC / getMaxLOC()) * constants.maxBoxGrowth
 }
 
+//TODO: this function is only looking 1 level down!!
 function getMaxLOC() {
   var rootNode = d3.select("#rootnode")[0][0].__data__
   var result = d3.max(rootNode.children.map(function(d) {
@@ -168,35 +168,62 @@ function getNodeY(d) {
 }
 
 
-function nodeEnter(p) {
-  d3.select(this).selectAll(".nodebox")
+
+function nodeEnter(node) {
+  highlightPathToParent(node, node.depth)
+}
+
+function highlightNode(node, brightness) {
+  var col = d3.rgb(constants.colorHighlight).brighter(brightness*constants.brightnessFactor)
+  d3.select(node).selectAll(".nodebox")
     .transition()
     .duration(constants.fadeIn)
-    .style("fill", constants.colorHighlight)
-  svg.selectAll(".link")
+    .style("fill", col.toString())
+    .style("stroke", col.toString())
+}
+
+function highlightLink(link, brightness) {
+  var col = d3.rgb(constants.colorHighlight).brighter(brightness*constants.brightnessFactor)
+  d3.select(link)
     .transition()
     .duration(constants.fadeIn)
-    .style("stroke", constants.colorHighlight)
-    
-  //TODO: highlight only path from this node to parent
-  console.log("nodeEnter")
-  console.log(this)
-  console.log(p)
-  console.log(svg.selectAll(".link"))
+    .style("stroke", col.toString())
+}
+
+function highlightPathToParent(node, startDepth) {
+  highlightNode(getNodeFromData(node), (startDepth - node.depth)*2)
+
+  var links = getAllLinks()
+  $.each(links, function(index, value) {
+    if (value.__data__.target == node) {
+      highlightLink(value, (startDepth - node.depth)*2+1)
+      highlightPathToParent(value.__data__.source, startDepth)
+    }
+  })
+}
+
+function getAllLinks() {
+  return svg.selectAll(".link")[0]
+}
+
+function getNodeFromData(node) {
+  var nodes = d3.selectAll(".node")[0]
+  var i;
+  for (i = 0; i < nodes.length; ++i) {
+    if (nodes[i].__data__ == node) {
+      return nodes[i]
+    }
+  }
 }
 
 
-function highlightLinkToParent(d) {
-
-
-}
-
-
+// set all visual values to defaults
 function nodeLeave() {
-  d3.select(this).selectAll(".nodebox")
+  d3.selectAll(".nodebox")
     .transition()
     .duration(constants.fadeOut)
     .style("fill", getFillColor)
+    .style("stroke", constants.colorLink)
   svg.selectAll(".link")
     .transition()
     .duration(constants.fadeOut)
