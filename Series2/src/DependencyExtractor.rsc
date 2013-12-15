@@ -1,7 +1,7 @@
 module DependencyExtractor
 
 import Types;
-//import CCAnalyzer;
+import CCAnalyzer;
 
 import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
@@ -11,13 +11,12 @@ import List;
 import Set;
 
 import FactExtractors::ExtractorCommon;
-import FactExtractors::MethodInfoExtractor;
+import MethodInfoExtractor;
 import Ranking;
-
-public VisualizationData ExtractClassDependencies(loc projectLoc)
+import IO;
+public VisualizationData ExtractClassDependencies(loc project)
 {
-	project = projectLoc;
-	M3 m3Model = createM3FromEclipseProject(project);
+	M3 m3Model = createM3FromEclipseProject(project);	
 	set[str] packages = GetAllPackageNames(m3Model);
 	
 	rel[loc from, loc to] dependencies = {r | r <- m3Model@typeDependency
@@ -33,7 +32,8 @@ public VisualizationData ExtractClassDependencies(loc projectLoc)
 	set[loc] classesAlreadyFound = {c.location |c <- classInfos};	
 	classInfos += GetIndependentClassInfos(allClasses, classesAlreadyFound);
 	
-	classInfos = MakeLocsPhysical(project, m3Model,	classInfos);										
+	classInfos = MakeLocsPhysical(project, m3Model,	classInfos);
+	classInfos = CalculateCC(classInfos);										
 	return VisualizationData(classInfos);
 }
 
@@ -94,7 +94,7 @@ private list[ClassInfo] GetDependentClassInfos(map[tuple[loc from, loc to] dep, 
 		ClassInfo ci = ClassInfo(f
 								,f.path
 								,GetLOC(f)
-								,1
+								,0
 								,());
 		
 		map[loc to, int count] dep = (c.to : classToClassDependencies[c] 
@@ -111,7 +111,7 @@ private list[ClassInfo] GetIndependentClassInfos(set[loc] allClasses, set[loc] c
 	return 	[ClassInfo(c
 						,c.path
 						,GetLOC(c)
-						,1
+						,0
 						,())
 						|c <- allClasses
 						,c notin classesAlreadyFound];	
@@ -124,23 +124,31 @@ private list[ClassInfo] MakeLocsPhysical(loc project,M3 m3Model, list[ClassInfo]
 	for(c <- classInfos)
 	{
 		ClassInfo ci = c;
-		for(cu <- compilationUnits)
+		
+		set[loc] cLoc = {project + cu.path |cu <- compilationUnits
+											,contains(cu.path, c.location.path)};
+		
+		if(size(cLoc) == 1)
 		{
-			if(contains(cu.path, c.location.path))
-			{
-				ci.location = project + cu.path;
-				break;
-			}
+			ci.location = cLoc[0];
+		}
+		else if(size(cLoc) == 0)
+		{
+			break;
+		}
+		else
+		{
+			println("More than one compilation unit found. cLoc <size(cLoc)>,<cLoc>");
 		}
 		
 		for(d <- c.dependencies)
 		{
+			int count = c.dependencies[d];
+			ci.dependencies -= (d:count);
 			for(cu <- compilationUnits)
 			{
 				if(contains(cu.path, d.path))
-				{
-					int count = c.dependencies[d];
-					ci.dependencies -= (d:count);
+				{					
 					ci.dependencies +=  (project + cu.path : count);
 					break;
 				}
@@ -150,4 +158,17 @@ private list[ClassInfo] MakeLocsPhysical(loc project,M3 m3Model, list[ClassInfo]
 	}
 	
 	return toReturn;
+}
+
+private list[ClassInfo] CalculateCC(list[ClassInfo] classInfos)
+{
+	list[ClassInfo] clone = classInfos;
+	for(i <- [0..size(clone)])
+	{		
+		ClassFacts cf = ClassFacts(clone[i].location
+									,ExtractMethodInfo(clone[i].location)
+									,clone[i].LOC);
+		clone[i].CC = AnalyzeComplexity(cf);
+	}
+	return clone;
 }
