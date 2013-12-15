@@ -29,7 +29,7 @@ data VisualizationData = VisualizationData(
 data params = params(loc location,int LOC, int CC)
 				|  params(loc location,int LOC, int CC, int dependencyCount);
 				
-data DependencyTree = DependencyTree(loc From, list[DependencyTree] Children)
+data DependencyTree = DependencyTree(loc From, list[DependencyTree] children)
 					| DependencyTree(str name, params params, list[DependencyTree] children);
 					
 					
