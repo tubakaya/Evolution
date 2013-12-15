@@ -30,11 +30,15 @@ public void writeFacts() {
 
 
 str getInfo(map[str,str] parameters) {
+  s = parameters["loc"];
+    
   return
     "\<h1\>Hallo\</h1\>
-    '  Het is \<b\>nu\</b\> <now()>.
-    '  Parameters:
-    '  <parameters>
+    '  Het is \<b\>nu\</b\> <now()>. \</br\>
+    '  Parameters: \</br\>
+    '  <parameters> \</br\>
+    '  \</br\>
+    '  loc = <s>
     ";
 }
 

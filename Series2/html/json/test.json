@@ -1,7 +1,6 @@
 {
   "name": "Main",
   "params": {
-    "location": "java+class:///testj/Main",
     "location": "project://TestJ/src/testj/Main.java",
     "LOC": 32,
     "CC": 1

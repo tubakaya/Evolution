@@ -1,7 +1,7 @@
 ﻿
 //var factsFile = "/json/SmallSql_formatted.json"
 //var factsFile = "/json/TestJ.json"
-var factsFile = "/json/TestJTree.json"
+var factsFile = "/json/test.json"
 
 var width = 960
 var height = 1000
@@ -10,17 +10,39 @@ var boxWidth = 130
 var fontSize = 10
 var lineSpace = 2
 
+var CLASS_INFO
+var TREE_DATA
+
+
 function loadFacts(filename) {
-  console.log('loading JSON file: ' + filename)
+  console.log("reading JSON file")
   d3.json(filename, function(error, facts) {
-    console.log('JSON file loaded')
+    console.log("JSON file readed")
     console.log(facts)
-    createTree(facts)
+    extractClassInfo(facts)
+    updateUI()
   })
 }
 
-function createTree(facts) {
-  var nodes = tree.nodes(facts)
+
+// convert Rascal JSON data structure to a Javascript list
+function extractClassInfo(facts) {
+  //TODO: convert facts into CLASS_INFO list
+  CLASS_INFO = facts
+}
+
+
+// create a tree strcuture with 'classname' as root
+function createTreeData(classname) {
+  //TODO: implement
+  // based on CLASS_INFO, create a tree structure with 'classname' as root
+  TREE_DATA = CLASS_INFO
+}
+
+
+// create a D3 tree
+function createGraph(treeData) {
+  var nodes = tree.nodes(treeData)
   var links = tree.links(nodes)
 
   // update and add links
@@ -61,9 +83,11 @@ function createTree(facts) {
   newNodes.on("mouseleave", nodeLeave)
 }
 
+
 function strokeWidth(d) {
   return d.target.params.dependencyCount*3
 }
+
 
 function nodeEnter() {
   thisNode = d3.select(this)
@@ -76,8 +100,8 @@ function nodeEnter() {
     .transition()
     .duration(1000)
     .style("stroke", color)
-//    .style("stroke-width", 20)
 }
+
 
 function nodeLeave() {
   d3.select(this).selectAll(".nodebox")
@@ -88,8 +112,8 @@ function nodeLeave() {
     .transition()
     .duration(250)
     .style("stroke", null)
-    .style("stroke-width", strokeWidth)
 }
+
 
 var tree = d3.layout.tree()
   .size([height, width - 160])
@@ -98,10 +122,12 @@ var tree = d3.layout.tree()
     return (a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
   })
 
+
 var diagonal = d3.svg.diagonal()
   .projection(function(d) {
     return [d.y, d.x]
   })
+
 
 var svg = d3.select("body").append("svg")
   .attr("width", width)
@@ -109,4 +135,25 @@ var svg = d3.select("body").append("svg")
   .append("g")
   .attr("transform", "translate(80,0)")
 
-loadFacts(factsFile);
+
+// enable UI when all information is loaded
+function updateUI() {
+  $("#frmDetails").submit(function(event) {
+    showGraph($("#txtClassname").val())
+    event.preventDefault()
+  })
+  $("#btnFindClass").removeAttr('disabled')
+}
+
+
+// create a tree for given classname and show
+function showGraph(className) {
+  //TODO: implement, add classname which should be root
+  createTreeData(className)
+  createGraph(TREE_DATA)
+}
+
+
+$(document).ready(function() {
+  loadFacts(factsFile);
+})
