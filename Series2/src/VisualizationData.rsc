@@ -6,9 +6,9 @@ module VisualizationData
 import IO;
 import DateTime;
 import lang::json::IO;
-//import lang::html5::DOM;
 import util::Editors;
 import util::Webserver;
+import String;
 
 import Utils;
 import Types;
@@ -28,9 +28,15 @@ public void writeFacts() {
 }
 
 
+str LOC_PARAMETER = "loc";
 
 str getInfo(map[str,str] parameters) {
-  s = parameters["loc"];
+  debug("getInfo");
+  
+  loc location = toLocation("");
+  if (LOC_PARAMETER in parameters) {
+    location = toLocation(parameters[LOC_PARAMETER]);
+  }
     
   return
     "\<h1\>Hallo\</h1\>
@@ -38,13 +44,25 @@ str getInfo(map[str,str] parameters) {
     '  Parameters: \</br\>
     '  <parameters> \</br\>
     '  \</br\>
-    '  loc = <s>
+    '  loc = <location>
     ";
 }
 
+
 str showLocation(map[str,str] parameters) {
-  edit(|project://TestJ/src/Extra.java|(1162,175,<49,1>,<57,2>));
-  return getInfo();
+  debug("showLocation");
+  
+  if (LOC_PARAMETER in parameters) {
+    loc location = toLocation(parameters[LOC_PARAMETER]);
+    //edit(|project://TestJ/src/Extra.java|(1162,175,<49,1>,<57,2>));
+    debug("\tgoing to editor on <location>");
+    
+    //TODO: this stops the execution of this function, and no http data is
+    //      ever returned
+    edit(location);
+  }
+
+  return "";
 }
 
 
@@ -58,7 +76,6 @@ public void webStart() {
     , "/getInfo": getInfo
     , "/showLocation": showLocation
   )));
-
 
   //TODO: it seems to be needed to wait 10 seconds; why?
   //      it looks like the first request has to be served within this timeframe

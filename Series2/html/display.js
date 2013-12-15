@@ -1,42 +1,26 @@
-﻿
-//var factsFile = "/json/SmallSql_formatted.json"
-//var factsFile = "/json/TestJ.json"
-var factsFile = "/json/test.json"
-
-var width = 960
-var height = 1000
-var boxHeight = 60
-var boxWidth = 130
-var fontSize = 10
-var lineSpace = 2
-
-var CLASS_INFO
-var TREE_DATA
+﻿var constants = {
+  //factsFile: "/json/SmallSql_formatted.json",
+  //factsFile: "/json/TestJ.json",
+  factsFile: "/json/test.json",
+  rascalWebserver: "http://localhost:8080/showLocation?loc=",
+  rascalWebserverInfo: "http://localhost:8080/getInfo?loc=",
+  width: 960,
+  height: 1000,
+  boxHeight: 60,
+  boxWidth: 130,
+  fontSize: 10,
+  lineSpace: 2
+}
 
 
 function loadFacts(filename) {
   console.log("reading JSON file")
-  d3.json(filename, function(error, facts) {
+  d3.json(filename, function(error, data) {
     console.log("JSON file readed")
-    console.log(facts)
-    extractClassInfo(facts)
+    console.log(data)
+    createGraph(data)
     updateUI()
   })
-}
-
-
-// convert Rascal JSON data structure to a Javascript list
-function extractClassInfo(facts) {
-  //TODO: convert facts into CLASS_INFO list
-  CLASS_INFO = facts
-}
-
-
-// create a tree strcuture with 'classname' as root
-function createTreeData(classname) {
-  //TODO: implement
-  // based on CLASS_INFO, create a tree structure with 'classname' as root
-  TREE_DATA = CLASS_INFO
 }
 
 
@@ -67,20 +51,21 @@ function createGraph(treeData) {
     })
   newNodes.append("rect")
       .attr('class', 'nodebox')
-      .attr("x", -boxWidth/2)
-      .attr("y", -boxHeight/2)
-      .attr("width", boxWidth)
-      .attr("height", boxHeight)
+      .attr("x", -constants.boxWidth/2)
+      .attr("y", -constants.boxHeight/2)
+      .attr("width", constants.boxWidth)
+      .attr("height", constants.boxHeight)
   newNodes.append("text")
     .attr("id", "nodetitle")
     .attr("class", "nodeTitle")
-    .attr("y", -boxHeight/2 + fontSize + 2*lineSpace)
+    .attr("y", -constants.boxHeight/2 + constants.fontSize + 2*constants.lineSpace)
     .attr("text-anchor", "middle")
     .text(function(d) {
       return d.name
     })
   newNodes.on("mouseenter", nodeEnter)
   newNodes.on("mouseleave", nodeLeave)
+  newNodes.on("click", nodeClick)
 }
 
 
@@ -115,8 +100,15 @@ function nodeLeave() {
 }
 
 
+function nodeClick() {
+  console.log(d3.select(this))
+  loc = d3.select(this)[0][0].__data__.params.location
+  console.log(loc)
+  $.get(constants.rascalWebserver + loc)
+}
+
 var tree = d3.layout.tree()
-  .size([height, width - 160])
+  .size([constants.height, constants.width - 160])
   .sort(function(a,b) {
     // order nodes alphabetically based on name
     return (a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
@@ -130,18 +122,14 @@ var diagonal = d3.svg.diagonal()
 
 
 var svg = d3.select("body").append("svg")
-  .attr("width", width)
-  .attr("height", height)
+  .attr("width", constants.width)
+  .attr("height", constants.height)
   .append("g")
   .attr("transform", "translate(80,0)")
 
 
 // enable UI when all information is loaded
 function updateUI() {
-  $("#frmDetails").submit(function(event) {
-    showGraph($("#txtClassname").val())
-    event.preventDefault()
-  })
   $("#btnFindClass").removeAttr('disabled')
 }
 
@@ -149,11 +137,14 @@ function updateUI() {
 // create a tree for given classname and show
 function showGraph(className) {
   //TODO: implement, add classname which should be root
-  createTreeData(className)
-  createGraph(TREE_DATA)
+  loadFacts(constants.factsFile)
 }
 
 
 $(document).ready(function() {
-  loadFacts(factsFile);
+  $("#frmDetails").submit(function(event) {
+    showGraph($("#txtClassname").val())
+    event.preventDefault()
+  })
+  updateUI()
 })
