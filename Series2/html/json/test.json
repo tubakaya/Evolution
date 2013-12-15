@@ -2,16 +2,17 @@
   "name": "Main",
   "params": {
     "location": "java+class:///testj/Main",
+    "location": "project://TestJ/src/testj/Main.java",
     "LOC": 32,
-    "CC": "Low"
+    "CC": 1
   },
   "children": [
     {
       "name": "Extra",
       "params": {
-        "location": "java+class:///testj/Extra",
+        "location": "project://TestJ/src/testj/Extra.java",
         "LOC": 89,
-        "CC": "High",
+        "CC": 5,
         "dependencyCount": 2
       },
       "children": []
@@ -19,9 +20,9 @@
     {
       "name": "Extra2",
       "params": {
-        "location": "java+class:///testj/Extra2",
+        "location": "project://TestJ/src/testj/Extra2.java",
         "LOC": 10,
-        "CC": "High",
+        "CC": 5,
         "dependencyCount": 7
       },
       "children": []
@@ -29,18 +30,18 @@
     {
       "name": "Extra3",
       "params": {
-        "location": "java+class:///testj/Extra3",
+        "location": "project://TestJ/src/testj/Extra3.java",
         "LOC": 10,
-        "CC": "High",
+        "CC": 3,
         "dependencyCount": 3
       },
       "children": [
         {
           "name": "Extra4",
           "params": {
-            "location": "java+class:///testj/Extra4",
+            "location": "project://TestJ/src/testj/Extra4.java",
             "LOC": 10,
-            "CC": "High",
+            "CC": 4,
             "dependencyCount": 4
           },
           "children": []
@@ -48,9 +49,9 @@
         {
           "name": "Extra5",
           "params": {
-            "location": "java+class:///testj/Extra5",
+            "location": "project://TestJ/src/testj/Extra5.java",
             "LOC": 10,
-            "CC": "High",
+            "CC": 4,
             "dependencyCount": 1
           },
           "children": []
