@@ -1,24 +1,47 @@
-﻿var constants = {
+﻿//TODO:
+//  - show details on hover (complete packagename, LOC, CC, etc)
+//  - show an 'open in Eclipse' button on hover
+
+var constants = {
   //factsFile: "/json/SmallSql_formatted.json",
   //factsFile: "/json/TestJ.json",
   factsFile: "/json/test.json",
+  
+  // Rascal webserver URL's for openening source files
   rascalWebserver: "http://localhost:8080/showLocation?loc=",
   rascalWebserverInfo: "http://localhost:8080/getInfo?loc=",
+  
+  // width and height of SVG viewport
   width: 960,
   height: 1000,
-  boxHeight: 50,
+
+  // width and height of node box  
   boxWidth: 120,
-  maxStrokeWidth: 30,
+  boxHeight: 50,
+
+  // maximum amount of pixels a node box can grow based on ClassInfo LOC
   maxBoxGrowth: 100,
-  // I've choosen an analogous color scheme ranging from 'green' (hue 122)
+  
+  // maximum stroke-width for a link between nodes, based on ClassInfo dependency count
+  maxStrokeWidth: 30,
+  
+  // colors for showing ClassInfo cyclomatic complexity
+  // We've choosen an analogous color scheme ranging from 'green' (hue 122)
   // for low CC to 'red' (hue 10) for high CC. This gives five colors with
   // hue values: 122, 70, 48, 32, 10.
   // To 'smoothen' the display values (makes them visually less 'hard')
   // decreased the saturation to 77 and brightness to 90.
   // See: http://goo.gl/aANQ1T
   colorsCC: ["#35E53B", "#C7E535", "#E5C235", "#E59335", "#E55335"],
-  colorHighlight: "RoyalBlue",
-  fadeIn: 1000,
+  
+  // color for mouse-over hightlighting
+  colorHighlight: "#4169E1",
+  
+  // color for links between nodes
+  colorLink: "#CCCCCC",
+  
+  // times (ms) for fade-in and -out
+  fadeIn: 800,
   fadeOut: 400
 }
 
@@ -146,7 +169,6 @@ function getNodeY(d) {
 
 
 function nodeEnter(p) {
-  //TODO: transitions onEnter do not work??
   d3.select(this).selectAll(".nodebox")
     .transition()
     .duration(constants.fadeIn)
@@ -156,12 +178,17 @@ function nodeEnter(p) {
     .duration(constants.fadeIn)
     .style("stroke", constants.colorHighlight)
     
-  //TODO: show complete packagename?
-
   //TODO: highlight only path from this node to parent
+  console.log("nodeEnter")
+  console.log(this)
   console.log(p)
   console.log(svg.selectAll(".link"))
-  
+}
+
+
+function highlightLinkToParent(d) {
+
+
 }
 
 
@@ -173,7 +200,7 @@ function nodeLeave() {
   svg.selectAll(".link")
     .transition()
     .duration(constants.fadeOut)
-    .style("stroke", null)
+    .style("stroke", constants.colorLink)
 }
 
 
@@ -192,7 +219,7 @@ var tree = d3.layout.tree()
     return (a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
   })
   .separation(function(a, b) {
-    return (a.parent == b.parent ? 1 : 2);
+    return (a.parent == b.parent ? 1 : 1)
   })
 
 
