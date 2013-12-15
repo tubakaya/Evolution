@@ -25,3 +25,11 @@ data ClassInfo = ClassInfo(
 data VisualizationData = VisualizationData(
   list[ClassInfo] classes
 );
+
+data params = params(loc location,int LOC, int CC)
+				|  params(loc location,int LOC, int CC, int dependencyCount);
+				
+data DependencyTree = DependencyTree(loc From, list[DependencyTree] Children)
+					| DependencyTree(str name, params params, list[DependencyTree] children);
+					
+					

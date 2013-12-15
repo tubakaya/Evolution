@@ -24,7 +24,16 @@
         "CC": 5,
         "dependencyCount": 7
       },
+      "children": [{
+      "name": "Extra",
+      "params": {
+        "location": "project://TestJ/src/testj/Extra.java",
+        "LOC": 89,
+        "CC": 5,
+        "dependencyCount": 2
+      },
       "children": []
+    }]
     },
     {
       "name": "Extra3",

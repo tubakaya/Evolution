@@ -13,7 +13,7 @@ import Set;
 import FactExtractors::ExtractorCommon;
 import MethodInfoExtractor;
 import Ranking;
-import IO;
+
 public VisualizationData ExtractClassDependencies(loc project)
 {
 	M3 m3Model = createM3FromEclipseProject(project);	
@@ -125,8 +125,8 @@ private list[ClassInfo] MakeLocsPhysical(loc project,M3 m3Model, list[ClassInfo]
 	{
 		ClassInfo ci = c;
 		
-		set[loc] cLoc = {project + cu.path |cu <- compilationUnits
-											,contains(cu.path, c.location.path)};
+		list[loc] cLoc = [project + cu.path |cu <- compilationUnits
+											,contains(cu.path, c.location.path)];
 		
 		if(size(cLoc) == 1)
 		{
@@ -135,10 +135,6 @@ private list[ClassInfo] MakeLocsPhysical(loc project,M3 m3Model, list[ClassInfo]
 		else if(size(cLoc) == 0)
 		{
 			break;
-		}
-		else
-		{
-			println("More than one compilation unit found. cLoc <size(cLoc)>,<cLoc>");
 		}
 		
 		for(d <- c.dependencies)
