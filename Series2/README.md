@@ -23,6 +23,17 @@
 	- for aesthetics and usability
 	- insights in the visualization
 
+
+
+## Criteria for judgement
+- Scenario
+- Criteria for aesthetics, usability and visualization
+	- Responsiveness, performance, error prevention (recall-remember), easily identifiable (by colors or size)
+- Story why the criteria are met
+- Convincing argumentation why the visualization is good (for the purpose)
+- Awesomeness
+
+
 ----------
 
 
