@@ -3,7 +3,11 @@
   "params": {
     "location": "project://TestJ/src/testj/Main.java",
     "LOC": 32,
-    "CC": 1
+    "CC": 1,
+    "maxLOC": 89,
+    "minLOC": 10,
+    "maxDepend": 8,
+    "minDepend": 1
   },
   "children": [
     {
