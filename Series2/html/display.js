@@ -8,9 +8,15 @@ var svg = null
 
 // constants used in program
 var constants = {
+  // JSON file with all classnames and widget to store them
   classnamesFile: "/json/classFileNames.json",
   widgetClassnames: "#cboClassnames",
 
+  // location and information about JSON files
+  JSONpath: "/json/",
+  JSONext: ".json",
+  
+  // test files with JSON data
   factsFile1: "/json/test/test1.json",
   factsFile2: "/json/test/test2.json",
   
@@ -299,10 +305,10 @@ swap = true
 // create a tree for given classname and show
 function showGraph(className) {
   //TODO: implement, add classname which should be root
-  //loadFacts(constants.factsFile1)
-
-  loadFacts(swap ? constants.factsFile1 : constants.factsFile2)
-  swap = !swap
+  loadFacts(constants.JSONpath + className + constants.JSONext)
+  
+//  loadFacts(swap ? constants.factsFile1 : constants.factsFile2)
+//  swap = !swap
 }
 
 
