@@ -11,11 +11,8 @@ var constants = {
   classnamesFile: "/json/classFileNames.json",
   widgetClassnames: "#cboClassnames",
 
-  //factsFile: "/json/SmallSql_formatted.json",
-  //factsFile: "/json/TestJ.json",
-  factsFile1: "/json/test.json",
-  factsFile2: "/json/test2.json",
-  //factsFile: "/json/smallsql.database.ExpressionFunctionTimestampDiff.json",
+  factsFile1: "/json/test/test1.json",
+  factsFile2: "/json/test/test2.json",
   
   // Rascal webserver URL's for openening source files
   rascalWebserver: "http://localhost:8080/showLocation?loc=",
