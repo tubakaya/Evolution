@@ -28,9 +28,6 @@ public void writeFacts() {
 }
 
 
-str getServerInfo(map[str,str] parameters) {
-  return "Rascal webserver running..."; 
-}
 
 str getInfo(map[str,str] parameters) {
   return
@@ -53,7 +50,7 @@ loc WEBROOT = |home:///Desktop/|;
 public void webStart() {
   //serve(SERVER, fileserver(WEBROOT));
   serve(SERVER, functionserver((
-      "/": getServerInfo
+      "/": getInfo
     , "/getInfo": getInfo
     , "/showLocation": showLocation
   )));

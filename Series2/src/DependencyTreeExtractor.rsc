@@ -63,7 +63,7 @@ public void WriteDependencyTrees(rel[loc from, loc to] dependencies,map[loc loca
 	}
 }
 
-private map[loc location,str fileName] GetClassFileNames(set[loc] allClasses)
+public map[loc location,str fileName] GetClassFileNames(set[loc] allClasses)
 {
 	map[loc location,str fileName] classFileNames =();
 	for(c<-allClasses)
@@ -200,7 +200,7 @@ private map[loc location,int count] GetDependenciesAndCount(loc class, rel[loc f
 private loc GetPhysicalLoc(loc logicalLoc)
 {
 	list[loc] cLoc = [project + cu.path |cu <- compilationUnits
-											,contains(cu.path, logicalLoc.path)];
+											,last(split("/",cu.path)) == (last(split("/",logicalLoc.path)) + ".java")];
 	
 	if(size(cLoc)<1)
 	{
