@@ -56,10 +56,14 @@ public void WriteDependencyTrees(rel[loc from, loc to] dependencies,map[loc loca
 	rel[loc from, loc to] dep = {d | d<-dependencies, isClass(d.to), InCompilationUnits(d.to)};
 	for(cl <- classFileNames)
 	{
-		DependencyTree dependencyTree = GetDependencyTree(cl,dep);
-		debug("DependencyTree generated.");
-		WriteJsonForClassDependencyTree(classFileNames[cl], dependencyTree);
-		debug("DependencyTree written in json file.");
+		loc file = |home:///Desktop/Series2/<classFileNames[cl]>.json|;
+		if(!exists(file))
+		{
+			DependencyTree dependencyTree = GetDependencyTree(cl,dep);
+			debug("DependencyTree generated.");
+			WriteJsonForClassDependencyTree(classFileNames[cl], dependencyTree);
+			debug("DependencyTree written in json file.");
+		}
 	}
 }
 
