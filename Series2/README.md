@@ -12,9 +12,9 @@
 - **[done]** HTML page with D3.org graphic
 - **[done]** Get information about Rascal webserver and location-click behaviour (Davy)
 - Design the graphics
-- Textbox/Combobox for finding classname
-- Generate JSON tree for each class info
-- Read JSON file with metrics from Javascript
+- **[done]** Textbox/Combobox for finding classname
+- **[done]** Generate JSON tree for each class info
+- **[done]** Read JSON file with metrics from Javascript
 - Get maximum and minimum LOC and Dependency count in JSON
 - List of important aesthetics (color, diagram, layout, whitespace, typeface)
 - List of usability criteria (efficient, effective, usable)
