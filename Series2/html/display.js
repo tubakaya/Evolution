@@ -2,6 +2,11 @@
 //  - show details on hover (complete packagename, LOC, CC, etc)
 //  - show an 'open in Eclipse' button on hover
 //  - add legend / explanation
+//  - some classnames don't fit inside the box
+//  - change colors and check for colorblindness
+//  - change colors (darker, brighter) on hover
+//  - add slider with number of levels to show
+
 
 // global SVG object for graph
 var svg = null
@@ -28,6 +33,9 @@ var constants = {
   width: 1000,
   height: 1000,
 
+  // max levels of tree to show
+  maxLevels: 5,
+  
   // width and height of node box  
   boxWidth: 120,
   boxHeight: 50,
@@ -62,22 +70,41 @@ var constants = {
 }
 
 
-//TODO: remove
-swap = true
+// globals used in program
+var globals = {
+  maxLevel: Number.MIN_VALUE,
+  maxSpan: Number.MIN_VALUE,
+  minCC: Number.MAX_VALUE,
+  maxCC: Number.MIN_VALUE,
+  minLOC: Number.MAX_VALUE,
+  maxLOC: Number.MIN_VALUE,
+  minDepend: Number.MAX_VALUE,
+  maxDepend: Number.MIN_VALUE
+}
+
+function initGlobals() {
+  globals.maxLevel = Number.MIN_VALUE
+  globals.maxSpan = Number.MIN_VALUE
+  globals.minCC = Number.MAX_VALUE
+  globals.maxCC = Number.MIN_VALUE
+  globals.minLOC = Number.MAX_VALUE
+  globals.maxLOC = Number.MIN_VALUE
+  globals.minDepend = Number.MAX_VALUE
+  globals.maxDepend = Number.MIN_VALUE
+}
+
+
 function loadClassnames(filename) {
   console.log("loading classnames: " + filename)
   $.getJSON(filename, function(data) {
     console.log("classnames loaded: " + filename)
-    $(constants.widgetClassnames).empty();
+    $(constants.widgetClassnames).empty()
+    //TODO: remove next 2 lines
+    $(constants.widgetClassnames).append($("<option>", {value: constants.factsFile1}).text(constants.factsFile1))
+    $(constants.widgetClassnames).append($("<option>", {value: constants.factsFile2}).text(constants.factsFile2))
     $.each(data.classes, function(key, value) {
-      //TODO: remove
-      keyStr = value
-      if (key > 2) {
-        keyStr = swap ? constants.factsFile1 : constants.factsFile2
-        swap = !swap
-      }
       $(constants.widgetClassnames).append(
-        $("<option>", {value: keyStr}).text(value)
+        $("<option>", {value: value}).text(value)
       )
     })
   })
@@ -92,30 +119,19 @@ function loadFacts(filename) {
   })
 }
 
-var maxLevel = 0
-var maxSpan = 0
-var minCC = Number.MAX_VALUE
-var maxCC = 0
-var minLOC = Number.MAX_VALUE
-var maxLOC = 0
-var minDepend = Number.MAX_VALUE
-var maxDepend = 0
 
 function traverse(data, level) {
-//  console.log(data.name)
-  
-  maxLevel = Math.max(level, maxLevel)
+  globals.maxLevel = Math.max(level, globals.maxLevel)
   if (data !== null && typeof(data) == "object") {
-    maxSpan = Math.max(data.children.length, maxSpan)
-    minCC = Math.min(data.params.CC, minCC)
-    maxCC = Math.max(data.params.CC, maxCC)
-    minLOC = Math.min(data.params.LOC, minLOC)
-    maxLOC = Math.max(data.params.LOC, maxLOC)
+    globals.maxSpan = Math.max(data.children.length, globals.maxSpan)
+    globals.minCC = Math.min(data.params.CC, globals.minCC)
+    globals.maxCC = Math.max(data.params.CC, globals.maxCC)
+    globals.minLOC = Math.min(data.params.LOC, globals.minLOC)
+    globals.maxLOC = Math.max(data.params.LOC, globals.maxLOC)
     if (data.params.dependencyCount != undefined) {
-      minDepend = Math.min(data.params.dependencyCount, minDepend)
-      maxDepend = Math.max(data.params.dependencyCount, maxDepend)
+      globals.minDepend = Math.min(data.params.dependencyCount, globals.minDepend)
+      globals.maxDepend = Math.max(data.params.dependencyCount, globals.maxDepend)
     }
-
     $.each(data.children, function(key, value) {
       traverse(value, level+1)
     })
@@ -123,20 +139,33 @@ function traverse(data, level) {
 }
 
 
+function truncateLevel(data, truncLevel, currLevel) {
+  currLevel = currLevel + 1
+  if (currLevel >= truncLevel) {
+    data.children = []
+  } else {
+    $.each(data.children, function(key, value) {
+      truncateLevel(value, truncLevel, currLevel)
+    })
+  }
+}
 
 
 // create a D3 tree
 function createGraph(treeData) {
+  initGlobals()
+  truncateLevel(treeData, constants.maxLevels, 0)
   traverse(treeData, 1)
-  console.log("maxLevel = " + maxLevel)
-  console.log("maxSpan = " + maxSpan)
-  console.log("minCC = " + minCC)
-  console.log("maxCC = " + maxCC)
-  console.log("minLOC = " + minLOC)
-  console.log("maxLOC = " + maxLOC)
-  console.log("minDepend = " + minDepend)
-  console.log("maxDepend = " + maxDepend)
-
+/*
+  console.log("maxLevel = " + globals.maxLevel)
+  console.log("maxSpan = " + globals.maxSpan)
+  console.log("minCC = " + globals.minCC)
+  console.log("maxCC = " + globals.maxCC)
+  console.log("minLOC = " + globals.minLOC)
+  console.log("maxLOC = " + globals.maxLOC)
+  console.log("minDepend = " + globals.minDepend)
+  console.log("maxDepend = " + globals.maxDepend)
+*/  
 
   // remove existing (SVG) graph and create a new one
   d3.select("svg").remove()
@@ -202,21 +231,12 @@ function getNodeText(d) {
 
 // get link stroke-width based on ClassInfo dependency count
 function getStrokeWidth(d) {
-  var maxDepend = getMaxDependencyCount()
+  var maxDepend = globals.maxDepend
   maxDepend = maxDepend == 0 ? 1 : maxDepend
   var strokeWidth = (d.target.params.dependencyCount / maxDepend) * constants.maxStrokeWidth
   // ensure that stroke-width is at least 2
   strokeWidth = strokeWidth < 2 ? 2 : strokeWidth;
   return strokeWidth
-}
-
-//TODO: this function is only looking 1 level down!!
-function getMaxDependencyCount() {
-  var rootNode = d3.select("#rootnode")[0][0].__data__
-  var result = d3.max(rootNode.children.map(function(d) {
-    return d.params.dependencyCount
-  }))
-  return result
 }
 
 // get node color based on ClassInfo Cyclomatic Complexity
@@ -226,18 +246,7 @@ function getFillColor(d) {
 
 // get node growth factor based on ClassInfo LOC
 function getBoxGrowth(d) {
-  var maxLOC = getMaxLOC()
-  maxLOC = maxLOC == 0 ? 1 : maxLOC
-  return (d.params.LOC / getMaxLOC()) * constants.maxBoxGrowth
-}
-
-//TODO: this function is only looking 1 level down!!
-function getMaxLOC() {
-  var rootNode = d3.select("#rootnode")[0][0].__data__
-  var result = d3.max(rootNode.children.map(function(d) {
-    return d.params.LOC
-  }))
-  return result
+  return (d.params.LOC / globals.maxLOC) * constants.maxBoxGrowth
 }
 
 function getNodeWidth(d) {
