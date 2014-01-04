@@ -1,7 +1,8 @@
 module DependencyExtractor
 
 import Types;
-import CCAnalyzer;
+import CC::CCAnalyzer;
+import CC::MethodInfoExtractor;
 
 import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
@@ -11,7 +12,6 @@ import List;
 import Set;
 
 import FactExtractors::ExtractorCommon;
-import MethodInfoExtractor;
 import Ranking;
 
 public VisualizationData ExtractClassDependencies(loc project)
