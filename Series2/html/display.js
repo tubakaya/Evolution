@@ -17,8 +17,8 @@ var constants = {
   JSONext: ".json",
   
   // test files with JSON data
-  factsFile1: "/json/test/test1.json",
-  factsFile2: "/json/test/test2.json",
+  factsFile1: "test/test1",
+  factsFile2: "test/test2",
   
   // Rascal webserver URL's for openening source files
   rascalWebserver: "http://localhost:8080/showLocation?loc=",
@@ -62,15 +62,22 @@ var constants = {
 }
 
 
+//TODO: remove
+swap = true
 function loadClassnames(filename) {
-  console.log("loading classnames")
+  console.log("loading classnames: " + filename)
   $.getJSON(filename, function(data) {
-    console.log("classnames loaded")
-    console.log(data)
+    console.log("classnames loaded: " + filename)
     $(constants.widgetClassnames).empty();
     $.each(data.classes, function(key, value) {
+      //TODO: remove
+      keyStr = value
+      if (key > 2) {
+        keyStr = swap ? constants.factsFile1 : constants.factsFile2
+        swap = !swap
+      }
       $(constants.widgetClassnames).append(
-        $("<option>", {value: value}).text(value)
+        $("<option>", {value: keyStr}).text(value)
       )
     })
   })
@@ -85,9 +92,52 @@ function loadFacts(filename) {
   })
 }
 
+var maxLevel = 0
+var maxSpan = 0
+var minCC = Number.MAX_VALUE
+var maxCC = 0
+var minLOC = Number.MAX_VALUE
+var maxLOC = 0
+var minDepend = Number.MAX_VALUE
+var maxDepend = 0
+
+function traverse(data, level) {
+//  console.log(data.name)
+  
+  maxLevel = Math.max(level, maxLevel)
+  if (data !== null && typeof(data) == "object") {
+    maxSpan = Math.max(data.children.length, maxSpan)
+    minCC = Math.min(data.params.CC, minCC)
+    maxCC = Math.max(data.params.CC, maxCC)
+    minLOC = Math.min(data.params.LOC, minLOC)
+    maxLOC = Math.max(data.params.LOC, maxLOC)
+    if (data.params.dependencyCount != undefined) {
+      minDepend = Math.min(data.params.dependencyCount, minDepend)
+      maxDepend = Math.max(data.params.dependencyCount, maxDepend)
+    }
+
+    $.each(data.children, function(key, value) {
+      traverse(value, level+1)
+    })
+  }
+}
+
+
+
 
 // create a D3 tree
 function createGraph(treeData) {
+  traverse(treeData, 1)
+  console.log("maxLevel = " + maxLevel)
+  console.log("maxSpan = " + maxSpan)
+  console.log("minCC = " + minCC)
+  console.log("maxCC = " + maxCC)
+  console.log("minLOC = " + minLOC)
+  console.log("maxLOC = " + maxLOC)
+  console.log("minDepend = " + minDepend)
+  console.log("maxDepend = " + maxDepend)
+
+
   // remove existing (SVG) graph and create a new one
   d3.select("svg").remove()
   svg = d3.select("#graph")
@@ -300,15 +350,9 @@ function updateUI() {
 }
 
 
-//TODO: remove
-swap = true
 // create a tree for given classname and show
 function showGraph(className) {
-  //TODO: implement, add classname which should be root
   loadFacts(constants.JSONpath + className + constants.JSONext)
-  
-//  loadFacts(swap ? constants.factsFile1 : constants.factsFile2)
-//  swap = !swap
 }
 
 
