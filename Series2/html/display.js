@@ -2,7 +2,6 @@
 //  - show details on hover (complete packagename, LOC, CC, etc)
 //  - show an 'open in Eclipse' button on hover
 //  - add legend / explanation
-//  - resize SVG object to available viewport
 
 // global SVG object for graph
 var svg = null
@@ -23,7 +22,7 @@ var constants = {
   rascalWebserverInfo: "http://localhost:8080/getInfo?loc=",
   
   // width and height of SVG viewport
-  width: 960,
+  width: 1000,
   height: 1000,
 
   // width and height of node box  
@@ -88,11 +87,13 @@ function loadFacts(filename) {
 function createGraph(treeData) {
   // remove existing (SVG) graph and create a new one
   d3.select("svg").remove()
-  svg = d3.select("body").append("svg")
-  .attr("width", constants.width)
-  .attr("height", constants.height)
-  .append("g")
-  .attr("transform", "translate(80,0)")
+  svg = d3.select("#graph")
+    .append("svg:svg")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("viewBox", "0 0 " + constants.width + " " + constants.height)
+    .append("g")
+    .attr("transform", "translate(80,0)")
 
   var nodes = tree.nodes(treeData)
   var links = tree.links(nodes)
