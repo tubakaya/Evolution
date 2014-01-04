@@ -1,11 +1,22 @@
 ﻿//TODO:
 //  - show details on hover (complete packagename, LOC, CC, etc)
 //  - show an 'open in Eclipse' button on hover
+//  - add legend / explanation
+//  - resize SVG object to available viewport
 
+// global SVG object for graph
+var svg = null
+
+// constants used in program
 var constants = {
+  classnamesFile: "/json/classFileNames.json",
+  widgetClassnames: "#cboClassnames",
+
   //factsFile: "/json/SmallSql_formatted.json",
   //factsFile: "/json/TestJ.json",
-  factsFile: "/json/test.json",
+  factsFile1: "/json/test.json",
+  factsFile2: "/json/test2.json",
+  //factsFile: "/json/smallsql.database.ExpressionFunctionTimestampDiff.json",
   
   // Rascal webserver URL's for openening source files
   rascalWebserver: "http://localhost:8080/showLocation?loc=",
@@ -45,20 +56,44 @@ var constants = {
   fadeOut: 300,
   
   // factor which is used to 'brighten' the path when hovering over a node
-  brightnessFactor: .5
+  brightnessFactor: .2
+}
+
+
+function loadClassnames(filename) {
+  console.log("loading classnames")
+  $.getJSON(filename, function(data) {
+    console.log("classnames loaded")
+    console.log(data)
+    $(constants.widgetClassnames).empty();
+    $.each(data.classes, function(key, value) {
+      $(constants.widgetClassnames).append(
+        $("<option>", {value: value}).text(value)
+      )
+    })
+  })
 }
 
 
 function loadFacts(filename) {
+  console.log("loading facts: " + filename)
   d3.json(filename, function(error, data) {
+    console.log("facts loaded: " + filename)
     createGraph(data)
-    updateUI()
   })
 }
 
 
 // create a D3 tree
 function createGraph(treeData) {
+  // remove existing (SVG) graph and create a new one
+  d3.select("svg").remove()
+  svg = d3.select("body").append("svg")
+  .attr("width", constants.width)
+  .attr("height", constants.height)
+  .append("g")
+  .attr("transform", "translate(80,0)")
+
   var nodes = tree.nodes(treeData)
   var links = tree.links(nodes)
 
@@ -256,30 +291,28 @@ var diagonal = d3.svg.diagonal()
   })
 
 
-var svg = d3.select("body").append("svg")
-  .attr("width", constants.width)
-  .attr("height", constants.height)
-  .append("g")
-  .attr("transform", "translate(80,0)")
-
-
 // enable UI when all information is loaded
 function updateUI() {
-  $("#btnFindClass").removeAttr('disabled')
 }
 
 
+//TODO: remove
+swap = true
 // create a tree for given classname and show
 function showGraph(className) {
   //TODO: implement, add classname which should be root
-  loadFacts(constants.factsFile)
+  //loadFacts(constants.factsFile1)
+
+  loadFacts(swap ? constants.factsFile1 : constants.factsFile2)
+  swap = !swap
 }
 
 
 $(document).ready(function() {
+  loadClassnames(constants.classnamesFile)
+  $(constants.widgetClassnames).combobox()
+  $(".custom-combobox-input").focus();
   $("#frmDetails").submit(function(event) {
-    showGraph($("#txtClassname").val())
     event.preventDefault()
   })
-  updateUI()
 })

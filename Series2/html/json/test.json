@@ -11,7 +11,7 @@
   },
   "children": [
     {
-      "name": "Extra",
+      "name": "Extra1.1",
       "params": {
         "location": "project://TestJ/src/testj/Extra.java",
         "LOC": 89,
@@ -21,26 +21,28 @@
       "children": []
     },
     {
-      "name": "Extra2",
+      "name": "Extra1.2",
       "params": {
         "location": "project://TestJ/src/testj/Extra2.java",
         "LOC": 10,
         "CC": 5,
         "dependencyCount": 7
       },
-      "children": [{
-      "name": "Extra",
-      "params": {
-        "location": "project://TestJ/src/testj/Extra.java",
-        "LOC": 89,
-        "CC": 5,
-        "dependencyCount": 2
-      },
-      "children": []
-    }]
+      "children": [
+        {
+          "name": "Extra1.2.1",
+          "params": {
+            "location": "project://TestJ/src/testj/Extra.java",
+            "LOC": 89,
+            "CC": 5,
+            "dependencyCount": 2
+          },
+          "children": []
+        }
+      ]
     },
     {
-      "name": "Extra3",
+      "name": "Extra1.3",
       "params": {
         "location": "project://TestJ/src/testj/Extra3.java",
         "LOC": 10,
@@ -49,17 +51,38 @@
       },
       "children": [
         {
-          "name": "Extra4",
+          "name": "Extra1.3.1",
           "params": {
             "location": "project://TestJ/src/testj/Extra4.java",
             "LOC": 10,
             "CC": 4,
             "dependencyCount": 4
           },
-          "children": []
+          "children": [
+            {
+              "name": "Extra1.3.1.1",
+              "params": {
+                "location": "project://TestJ/src/testj/Extra4.java",
+                "LOC": 20,
+                "CC": 4,
+                "dependencyCount": 8
+              },
+              "children": []
+            },
+            {
+              "name": "Extra1.3.1.2",
+              "params": {
+                "location": "project://TestJ/src/testj/Extra4.java",
+                "LOC": 15,
+                "CC": 2,
+                "dependencyCount": 1
+              },
+              "children": []
+            }
+          ]
         },
         {
-          "name": "Extra5",
+          "name": "Extra1.3.2",
           "params": {
             "location": "project://TestJ/src/testj/Extra5.java",
             "LOC": 10,

@@ -3,19 +3,25 @@
 
 <head>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <meta charset="utf-8">
   <title>Series 2</title>
+	<link href="lib/jquery-ui-1.10.3.custom/css/smoothness/jquery-ui-1.10.3.custom.css" rel="stylesheet" type="text/css">
   <link href="index.css" rel="stylesheet" type="text/css">
+  <link href="custom_combobox.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
   <form id="frmDetails">
-    <label id="lblClassname" accesskey="C" ><span class="accesskey">C</span>lass name:
-    <input id="txtClassname" type="text" autofocus="autofocus" /></label>
-    <input id="btnFindClass" type="submit" value="Find" disabled="disabled" />
+    <div class="ui-widget">
+      <label id="lblClassname" accesskey="C" ><span class="accesskey">C</span>lassname:</label>
+      <select id="cboClassnames"></select>
+    </div>
   </form>
 
   <script src="lib/jquery-2.0.3.min.js" charset="utf-8"></script>
+	<script src="lib/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
   <script src="lib/d3.v3.min.js" charset="utf-8"></script>
+  <script src="custom_combobox.js"></script>
   <script src="display.js" charset="utf-8"></script>
 </body>
 
