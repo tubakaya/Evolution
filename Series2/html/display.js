@@ -55,11 +55,12 @@ var constants = {
   // See: http://goo.gl/aANQ1T
   colorsCC: ["#35E53B", "#C7E535", "#E5C235", "#E59335", "#E55335"],
   
-  // color for mouse-over hightlighting
-  colorHighlight: "#4169E1",
-  
   // color for links between nodes
-  colorLink: "#CCCCCC",
+  colorLink: "#CCC",
+
+  // color for mouse-over hightlighting
+  //colorHighlight: "#4169E1",
+  colorHighlight: "#888",
   
   // times (ms) for fade-in and -out
   fadeIn: 600,
@@ -165,7 +166,7 @@ function createGraph(treeData) {
   console.log("maxLOC = " + globals.maxLOC)
   console.log("minDepend = " + globals.minDepend)
   console.log("maxDepend = " + globals.maxDepend)
-*/  
+*/
 
   // remove existing (SVG) graph and create a new one
   d3.select("svg").remove()
@@ -265,15 +266,14 @@ function getNodeY(d) {
   return -getNodeHeight(d)/2
 }
 
-
-
 function nodeEnter(node) {
   highlightPathToParent(node, node.depth)
 }
 
-function highlightNode(node, brightness) {
-  var col = d3.rgb(constants.colorHighlight).brighter(brightness*constants.brightnessFactor)
-  d3.select(node).selectAll(".nodebox")
+function highlightNode(nodeDOM, nodeData, brightness) {
+  var col = d3.rgb(getFillColor(nodeData)).darker(constants.maxLevels*constants.brightnessFactor)
+  col = d3.rgb(col).brighter(brightness*constants.brightnessFactor)
+  d3.select(nodeDOM).selectAll(".nodebox")
     .transition()
     .duration(constants.fadeIn)
     .style("fill", col.toString())
@@ -289,7 +289,7 @@ function highlightLink(link, brightness) {
 }
 
 function highlightPathToParent(node, startDepth) {
-  highlightNode(getNodeFromData(node), (startDepth - node.depth)*2)
+  highlightNode(getNodeFromData(node), node, (startDepth - node.depth)*2)
 
   var links = getAllLinks()
   $.each(links, function(index, value) {
