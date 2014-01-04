@@ -1,7 +1,9 @@
 module DependencyTreeExtractor
 
 import Types;
-import CCAnalyzer;
+import CC::CCAnalyzer;
+import CC::MethodInfoExtractor;
+import IO::FileWriter;
 
 import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
@@ -13,37 +15,51 @@ import Map;
 import IO;
 
 import FactExtractors::ExtractorCommon;
-import MethodInfoExtractor;
 import Ranking;
-import lang::json::IO;
+import Utils;
 
 loc project;
 set[loc] compilationUnits;
 
-public void ExtractClassDependencies(loc location)
+public M3 GetM3Model(loc location)
 {
 	project=location;
-	M3 m3Model = createM3FromEclipseProject(project);	
-	compilationUnits = files(m3Model@containment);
-	
-	set[str] packages = GetAllPackageNames(m3Model);	
+	M3 m3Model =  createM3FromEclipseProject(project);	
+	return m3Model;
+}
+
+public rel[loc from, loc to] GetDependenciesWithinPackages(M3 m3Model)
+{
+	set[str] packages = GetAllPackageNames(m3Model);
+	debug("found package names.");	
 	rel[loc from, loc to] dependencies = {r | r <- m3Model@typeDependency
 											, InPackages(r.from, packages)
 											, InPackages(r.to, packages)};
-	
-	set[loc] allClasses ={ c
+	return dependencies;
+}
+
+public set[loc] GetAllClassFiles(M3 m3Model)
+{
+	compilationUnits = files(m3Model@containment);
+	set[loc] allClasses = { c
 							|c <- classes(m3Model)
 							,cu <- compilationUnits
-							,contains(cu.path, c.path)};
-	
+							,contains(cu.path, c.path)
+							,!contains(c.path,"junit")
+							,!contains(c.path,"test")};	
+	debug("found all classes (that have a file). Count: <size(allClasses)>");	
+	return allClasses;
+}
 
-	map[loc location,str fileName] classFileNames = GetClassFileNames(allClasses);
-	WriteClassAndFileNamesToJson(classFileNames);
-	
-	for(cl<-allClasses)
+public void WriteDependencyTrees(rel[loc from, loc to] dependencies,map[loc location,str fileName] classFileNames)
+{
+	rel[loc from, loc to] dep = {d | d<-dependencies, isClass(d.to), InCompilationUnits(d.to)};
+	for(cl <- classFileNames)
 	{
-		DependencyTree dependencyTree = GetDependencyTree(cl,dependencies);
+		DependencyTree dependencyTree = GetDependencyTree(cl,dep);
+		debug("DependencyTree generated.");
 		WriteJsonForClassDependencyTree(classFileNames[cl], dependencyTree);
+		debug("DependencyTree written in json file.");
 	}
 }
 
@@ -59,19 +75,19 @@ private map[loc location,str fileName] GetClassFileNames(set[loc] allClasses)
 	return classFileNames;
 }
 
-private void WriteClassAndFileNamesToJson(map[loc location,str fileName] classFileNames)
+
+public void ExtractClassDependencies(loc location)
 {
-	str text="{\"classes\": [";
-		
-	for(c <- classFileNames)
-	{		
-		text += "\"<classFileNames[c]>\",";
-	}
-	text = substring(text,0,size(text)-1);
-	text+="]}";
-	 
-	loc file = |home:///Desktop/Series2/classFileNames.json|;
-  	writeFile(file, text); 
+	debug("Started class dependency extraction...");
+	M3 m3Model = GetM3Model(location);
+	rel[loc from, loc to] dependencies = GetDependenciesWithinPackages(m3Model);
+	
+	set[loc] allClasses = GetAllClassFiles(m3Model);
+	
+	map[loc location,str fileName] classFileNames=GetClassFileNames(allClasses);
+	WriteClassAndFileNamesToJson(classFileNames);
+	
+	WriteDependencyTrees(dependencies, classFileNames);
 }
 
 private set[str] GetAllPackageNames(M3 m3Model)
@@ -94,65 +110,33 @@ private bool InPackages(loc file, set[str] packages)
 	}
 	return result;
 }
-private void WriteJsonForClassDependencyTree(str fileName, DependencyTree dependencyTree)
-{	
-	str text="{";
-	text+= "\"name\": \"<dependencyTree.name>\",";
-	text+= "\"params\": {";
-		text+="\"location\": \"<dependencyTree.params.location>\",";
-		text+="\"LOC\": <dependencyTree.params.LOC>,";
-		text+="\"CC\": <dependencyTree.params.CC>";
-	text+="},";
-	text+="\"children\": [";			
-	for(c <- dependencyTree.children)
-	{
-		text+=GetTextForChild(c);
-		text += ",";
-	}
-	if(size(dependencyTree.children)>0)
-	{
-		text = substring(text,0,size(text)-1);
-	}
-	text+="]}";
-	 
-	loc file = |home:///Desktop/Series2/<fileName>.json|;
-  	writeFile(file, text); 
-}
 
-private str GetTextForChild(DependencyTree dependencyTree)
+
+private bool InCompilationUnits(loc file)
 {
-	str text = "{";
-	text+= "\"name\": \"<dependencyTree.name>\",";
-	text+= "\"params\": {";
-		text+="\"location\": \"<dependencyTree.params.location>\",";
-		text+="\"LOC\": <dependencyTree.params.LOC>,";
-		text+="\"CC\": <dependencyTree.params.CC>,";
-		text+="\"dependencyCount\": <dependencyTree.params.dependencyCount>";
-	text+="},";
-	text+="\"children\": [";
-	if(size(dependencyTree.children)>0)
+	bool result = false;
+	for(cu <- compilationUnits)
 	{
-		for(dc<-dependencyTree.children)
+		if(contains(cu.path, file.path))
 		{
-			text+=GetTextForChild(dc);
+			result=true;
+			break;
 		}
 	}
-
-	text+="]}";
-	return text;
+	return result;
 }
 
 set[loc] visitedClasses;
 private DependencyTree GetDependencyTree(loc class, rel[loc from, loc to] dependencies)
 {
-	visitedClasses={class};
+	debug("\tStarted GetDependencyTree for class <class.path>");
+	visitedClasses = {class};
 
 	map[loc location,int count] depCount= GetDependenciesAndCount(class, dependencies);
 
 	str name=last(split("/",class.path));
 	loc physicalLoc = GetPhysicalLoc(class);
-	int totalLOC=GetLOC(class);
-	
+	int totalLOC=GetLOC(class);	
 	
 	return DependencyTree(name,
 						params(
@@ -167,6 +151,7 @@ private DependencyTree GetDependencyTree(loc class, rel[loc from, loc to] depend
 
 private DependencyTree GetDependencyTreeForChild(loc class, rel[loc from, loc to] dependencies, int dependencyCount)
 {
+	debug("\t\tChild class: <class.path>");
 	str name = last(split("/",class.path));
 	loc physicalLoc = GetPhysicalLoc(class);
 	int totalLOC = GetLOC(class);
@@ -187,7 +172,8 @@ private DependencyTree GetDependencyTreeForChild(loc class, rel[loc from, loc to
 	map[loc location,int count] depCount= GetDependenciesAndCount(class, dependencies);
 	dt.children = size(depCount) > 0 ?
 							[GetDependencyTreeForChild(d,dependencies,depCount[d])
-								|d<-depCount]
+								|d<-depCount
+								,d notin visitedClasses]
 							: [];
 							
 	return dt;
@@ -197,18 +183,15 @@ private map[loc location,int count] GetDependenciesAndCount(loc class, rel[loc f
 {
 	map[loc location,int count] depCount=();
 	
-	for(r <- dependencies)
-	{
-		if(r.to != class && contains(r.from.path,class.path))
+	for(r <- dependencies, r.to != class && contains(r.from.path,class.path))
+	{		
+		if(r.to in depCount)
 		{
-			if(r.to in depCount)
-			{
-				depCount[r.to] += 1;
-			}
-			else
-			{
-				depCount += (r.to : 1);
-			}
+			depCount[r.to] += 1;
+		}
+		else
+		{
+			depCount += (r.to : 1);
 		}
 	}
 	return depCount;
