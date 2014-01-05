@@ -23,6 +23,7 @@ var constants = {
   factsFile2: "test/test2",
   
   // Rascal webserver URL's for openening source files
+  //TODO: revert
   rascalWebserverInfo: "http://localhost:8080/showLocation?loc=",
   rascalWebserver: "http://localhost:8080/getInfo?loc=",
   
@@ -51,6 +52,9 @@ var constants = {
   // decreased the saturation to 77 and brightness to 90.
   // See: http://goo.gl/aANQ1T
   colorsCC: ["#35E53B", "#C7E535", "#E5C235", "#E59335", "#E55335"],
+
+  // See: http://goo.gl/f5Z3kq
+  colorsCC: ["#18F230", "#FFF300", "#00C8F2", "#FF8AEB", "#F22918"],
   
   // colors for elements
   colorLink: "#CCC",      // color for links between nodes
@@ -315,7 +319,7 @@ function moveText(node) {
     .transition()
     .duration(constants.fadeIn)
     .attr("y", -10) //-(getNodeHeight(node)/2)+25)
-    .attr("fill", constants.colorTextHover)
+//    .attr("fill", constants.colorTextHover)
 }
 
 function highlightNode(nodeDOM, nodeData, brightness) {
@@ -324,8 +328,9 @@ function highlightNode(nodeDOM, nodeData, brightness) {
   d3.select(nodeDOM).selectAll(".nodebox")
     .transition()
     .duration(constants.fadeIn)
-    .style("fill", col.toString())
-    .style("stroke", col.toString())
+//    .style("fill", col.toString())
+//    .style("stroke", col.toString())
+    .style("stroke", "#000")
 }
 
 function highlightLink(link, brightness) {
@@ -333,7 +338,9 @@ function highlightLink(link, brightness) {
   d3.select(link)
     .transition()
     .duration(constants.fadeIn)
-    .style("stroke", col.toString())
+//    .style("stroke", col.toString())
+    .style("stroke", constants.colorLinkHover)
+
 }
 
 function highlightPathToParent(node, startDepth) {
