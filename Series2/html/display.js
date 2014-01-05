@@ -51,10 +51,10 @@ var constants = {
   // To 'smoothen' the display values (makes them visually less 'hard')
   // decreased the saturation to 77 and brightness to 90.
   // See: http://goo.gl/aANQ1T
-  colorsCC: ["#35E53B", "#C7E535", "#E5C235", "#E59335", "#E55335"],
+  colorsCC: ["#E55335", "#E59335", "#E5C235", "#C7E535", "#35E53B"],
 
   // See: http://goo.gl/f5Z3kq
-  colorsCC: ["#18F230", "#FFF300", "#00C8F2", "#FF8AEB", "#F22918"],
+  colorsCC: ["#F22918", "#FF8AEB", "#00C8F2", "#FFF300", "#18F230"],
   
   // colors for elements
   colorLink: "#CCC",      // color for links between nodes
@@ -203,6 +203,8 @@ function createGraph(treeData) {
     .attr("y", getNodeY)
     .attr("width", getNodeWidth)
     .attr("height", getNodeHeight)
+    .attr("rx", 10)
+    .attr("ry", 10)
     .style("fill", getFillColor)
   newNodes.append("text")
     .attr("class", "nodeTitle")
