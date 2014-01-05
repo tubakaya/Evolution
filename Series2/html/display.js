@@ -1,10 +1,7 @@
 ﻿//TODO:
 //  - show details on hover (complete packagename, LOC, CC, etc)
-//  - show an 'open in Eclipse' button on hover
 //  - add legend / explanation
-//  - some classnames don't fit inside the box
 //  - change colors and check for colorblindness
-//  - change colors (darker, brighter) on hover
 //  - add slider with number of levels to show
 
 
@@ -55,12 +52,11 @@ var constants = {
   // See: http://goo.gl/aANQ1T
   colorsCC: ["#35E53B", "#C7E535", "#E5C235", "#E59335", "#E55335"],
   
-  // color for links between nodes
-  colorLink: "#CCC",
-
-  // color for mouse-over hightlighting
-  //colorHighlight: "#4169E1",
-  colorHighlight: "#888",
+  // colors for elements
+  colorLink: "#CCC",      // color for links between nodes
+  colorLinkHover: "#888",
+  colorText: "#000",      // color for text in nodes
+  colorTextHover: "#DDD",
   
   // times (ms) for fade-in and -out
   fadeIn: 600,
@@ -198,21 +194,45 @@ function createGraph(treeData) {
       return "translate(" + d.y + "," + d.x + ")"
     })
   newNodes.append("rect")
-      .attr('class', 'nodebox')
-      .attr("x", getNodeX)
-      .attr("y", getNodeY)
-      .attr("width", getNodeWidth)
-      .attr("height", getNodeHeight)
-      .style("fill", getFillColor)
+    .attr('class', 'nodebox')
+    .attr("x", getNodeX)
+    .attr("y", getNodeY)
+    .attr("width", getNodeWidth)
+    .attr("height", getNodeHeight)
+    .style("fill", getFillColor)
   newNodes.append("text")
-    .attr("id", "nodetitle")
     .attr("class", "nodeTitle")
     .attr("y", 0)
     .attr("text-anchor", "middle")
-    .text(getNodeText)
+    .text(getNodeTitle)
+  newNodes.append("text")
+    .attr("class", "nodeEclipse")
+    .attr("y", 20)
+    .attr("text-anchor", "middle")
+    .attr("fill-opacity", "0.0")
+    .text("Open in Eclipse")
+    .on("click", nodeClick)
+/*
+  newNodes.append("text")
+    .attr("class", "nodeText textLOC")
+    .attr("y", function(d) {
+      return (getNodeHeight(d) / 2) - 22
+    })
+    .attr("text-anchor", "middle")
+    //.attr("visibility", "visible")
+    //.attr("visibility", "hidden")
+    .text(getNodeTextLOC)
+  newNodes.append("text")
+    .attr("class", "nodeText textCC")
+    .attr("y", function(d) {
+      return (getNodeHeight(d) / 2) - 10
+    })
+    .attr("text-anchor", "middle")
+    .text(getNodeTextCC)
+*/
   newNodes.on("mouseenter", nodeEnter)
   newNodes.on("mouseleave", nodeLeave)
-  newNodes.on("click", nodeClick)
+  //newNodes.on("click", nodeClick)
   
   // update links after all nodes are added
   newLinks.style("stroke-width", getStrokeWidth)
@@ -226,8 +246,16 @@ function getNodeID(d) {
   return "";
 }
 
-function getNodeText(d) {
-  return d.name
+function getNodeTitle(d) {
+  return d.name.length > 16 ? d.name.substring(0, 15) + "..." : d.name
+}
+
+function getNodeTextLOC(d) {
+  return "LOC: " + d.params.LOC
+}
+
+function getNodeTextCC(d) {
+  return "Complexity: " + d.params.CC
 }
 
 // get link stroke-width based on ClassInfo dependency count
@@ -267,7 +295,27 @@ function getNodeY(d) {
 }
 
 function nodeEnter(node) {
+  moveText(node)
+  showHyperlink(node, true)
   highlightPathToParent(node, node.depth)
+}
+
+function showHyperlink(node, show) {
+  var nodeDOM = getNodeFromData(node)
+  d3.select(nodeDOM).select(".nodeEclipse")
+    .transition()
+    .duration(constants.fadeIn)
+    //.attr("visibility", show ? "visible" : "hidden")
+    .attr("fill-opacity", show ? "1.0" : "0.0")
+}
+
+function moveText(node) {
+  var nodeDOM = getNodeFromData(node)
+  d3.select(nodeDOM).select(".nodeTitle")
+    .transition()
+    .duration(constants.fadeIn)
+    .attr("y", -10) //-(getNodeHeight(node)/2)+25)
+    .attr("fill", constants.colorTextHover)
 }
 
 function highlightNode(nodeDOM, nodeData, brightness) {
@@ -281,7 +329,7 @@ function highlightNode(nodeDOM, nodeData, brightness) {
 }
 
 function highlightLink(link, brightness) {
-  var col = d3.rgb(constants.colorHighlight).brighter(brightness*constants.brightnessFactor)
+  var col = d3.rgb(constants.colorLinkHover).brighter(brightness*constants.brightnessFactor)
   d3.select(link)
     .transition()
     .duration(constants.fadeIn)
@@ -314,9 +362,8 @@ function getNodeFromData(node) {
   }
 }
 
-
 // set all visual values to defaults
-function nodeLeave() {
+function nodeLeave(node) {
   d3.selectAll(".nodebox")
     .transition()
     .duration(constants.fadeOut)
@@ -326,11 +373,16 @@ function nodeLeave() {
     .transition()
     .duration(constants.fadeOut)
     .style("stroke", constants.colorLink)
+  d3.selectAll(".nodeTitle")
+    .transition()
+    .duration(constants.fadeOut)
+    .attr("y", 0)
+    .attr("fill", constants.colorText)
+  showHyperlink(node, false)
 }
 
 
 function nodeClick() {
-  console.log(d3.select(this))
   loc = d3.select(this)[0][0].__data__.params.location
   console.log(loc)
   $.get(constants.rascalWebserver + loc)
