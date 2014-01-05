@@ -11,11 +11,11 @@ var svg = null
 // constants used in program
 var constants = {
   // JSON file with all classnames and widget to store them
-  classnamesFile: "/json/classFileNames.json",
+  classnamesFile: "/json/SmallSql/classFileNames.json",
   widgetClassnames: "#cboClassnames",
 
   // location and information about JSON files
-  JSONpath: "/json/",
+  JSONpath: "/json/SmallSql/",
   JSONext: ".json",
   
   // test files with JSON data
@@ -23,8 +23,8 @@ var constants = {
   factsFile2: "test/test2",
   
   // Rascal webserver URL's for openening source files
-  rascalWebserver: "http://localhost:8080/showLocation?loc=",
-  rascalWebserverInfo: "http://localhost:8080/getInfo?loc=",
+  rascalWebserverInfo: "http://localhost:8080/showLocation?loc=",
+  rascalWebserver: "http://localhost:8080/getInfo?loc=",
   
   // width and height of SVG viewport
   width: 1000,
