@@ -140,6 +140,10 @@ function traverse(data, level) {
       globals.minDepend = Math.min(data.params.dependencyCount, globals.minDepend)
       globals.maxDepend = Math.max(data.params.dependencyCount, globals.maxDepend)
     }
+    
+    //TODO: limit the span of the tree??
+    data.children = data.children.slice(0, 4)
+    
     $.each(data.children, function(key, value) {
       traverse(value, level+1)
     })
@@ -440,7 +444,6 @@ function showGraph(className) {
 
 
 function toggleLegend(show) {
-  console.log("legend = " + $("#right_col").css("display"))
   if (show == undefined) {
     show = $("#right_col").css("display") == "none"
   }
