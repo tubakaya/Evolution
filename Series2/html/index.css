@@ -8,28 +8,152 @@
 	/* font-size: 95%; */
 }
 
-#upper {
-	height: 40px;
-	width: 100%;
-	position: fixed;
-	margin: 0px;
-	padding: 10px;
-	background: #AAA;
+p {
+  margin: 0;
+  padding: 0;
 }
 
-#graph {
-  display: block;
-  width: 100%;    
-  margin: 0 auto;
+#masthead {
+}
+
+#top_nav {
   padding: 10px;
-  position: fixed;
-  top: 60px;
-  bottom: 0;
+  background: #AAA;
 }
 
+#container {
+	min-width: 600px;
+}
+
+#right_col {
+  display: none;
+	width: 200px;
+	float: right;
+}
+
+#page_content {
+	margin-right: 0px;
+	padding: 10px;
+}
+
+#footer {
+  background: olive;
+	clear: both;
+}
+
+/* Legend */
+#btnLegend {
+  width: 100px;
+  float: right;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.legend {
+  font-size: 13px;
+  padding-left: 30px;
+}
+
+.legend h2 {
+  font-size: 20px;
+}
+
+.legend .title {
+}
+
+.legend .subtitle {
+	font-size: 11px;
+	color: #555;
+}
+
+.legend ul {
+	margin: 0;
+	padding: 0;
+}
+
+.legend li {
+	margin-top: 7px;
+	list-style: none;
+}
+
+.CC0, .CC1, .CC2, .CC3, .CC4 {
+	margin-right: 5px;
+	padding: 0 10px;
+}
+
+.CC0 {
+  background: #F22918;
+}
+
+.CC1 {
+  background: #FF8AEB;
+}
+
+.CC2 {
+  background: #00C8F2;
+}
+
+.CC3 {
+  background: #FFF300;
+}
+
+.CC4 {
+  background: #18F230;
+}
+
+.depend0, .depend1 {
+	position: relative;
+	display: inline-block;
+	margin-right: 5px;
+	padding: 0 10px;
+	background: #CCC;
+}
+
+.depend0 {
+	height: 3px;
+	top: -3px;
+}
+
+.depend1 {
+	height: 20px;
+	top: 5px;
+}
+
+.legend .LOC li {
+	margin-top: 0px;
+	list-style: none;
+}
+
+.LOC0, .LOC1 {
+	position: relative;
+	display: inline-block;
+	margin-right: 5px;
+	padding: 0 10px;
+	background: #00C8F2;
+	border: 1px #CCC solid;
+}
+
+.LOC0 {
+	margin-left: 13px;
+	margin-right: 18px;
+	border-radius: 5px;
+	height: 20px;
+	width: 3px;
+	top: 7px;
+}
+
+.LOC1 {
+	border-radius: 10px;
+	height: 40px;
+	width: 30px;
+	top: 17px;
+}
+
+
+/* SVG elements */
 .nodebox {
-  fill: #fff;
-  stroke: #ccc;
+  fill: #FFF;
+  stroke: #CCC;
   stroke-width: 1px;
 }
 
@@ -53,7 +177,7 @@
 
 .link {
   fill: none;
-  stroke: #ccc;
+  stroke: #CCC;
   stroke-width: 1px;
 }
 

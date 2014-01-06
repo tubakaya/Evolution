@@ -11,9 +11,6 @@
     },
 
     _createAutocomplete: function() {
-      console.log(this.element)
-      console.log($(this.element).attr('id'))
-
       var selected = this.element.children( ":selected" ),
         value = selected.val() ? selected.text() : "";
 

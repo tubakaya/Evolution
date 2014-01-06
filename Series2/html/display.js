@@ -1,6 +1,5 @@
 ﻿//TODO:
 //  - show details on hover (complete packagename, LOC, CC, etc)
-//  - add legend / explanation
 //  - change colors and check for colorblindness
 //  - add slider with number of levels to show
 
@@ -426,6 +425,24 @@ function showGraph(className) {
 }
 
 
+function toggleLegend(show) {
+  console.log("legend = " + $("#right_col").css("display"))
+  if (show == undefined) {
+    show = $("#right_col").css("display") == "none"
+  }
+  
+  var marginRightValue = show ? "200px" : "0px"
+  var btnValue = (show ? "Hide" : "Show") + " legend"
+  if (show) {
+    $("#right_col").show(constants.fadeOut)
+  } else {
+    $("#right_col").hide(constants.fadeOut)
+  }
+  $("#page_content").animate({marginRight: marginRightValue}, constants.fadeOut)
+  $("#btnLegend").text(btnValue)
+}
+
+
 $(document).ready(function() {
   loadClassnames(constants.classnamesFile)
   $(constants.widgetClassnames).combobox()
@@ -433,4 +450,12 @@ $(document).ready(function() {
   $("#frmDetails").submit(function(event) {
     event.preventDefault()
   })
+	$.each(constants.colorsCC, function(key, value) {
+	  $(".CC" + key).css("background-color", constants.colorsCC[key])
+	})
+
+	$("#btnLegend").click(function() {
+	  toggleLegend()
+	})
+  //toggleLegend(true)
 })
