@@ -10,8 +10,8 @@ var svg = null
 // constants used in program
 var constants = {
   // the Java project for maintenance
-  project: "test",
-  //project: "SmallSql",
+  //project: "test",
+  project: "SmallSql",
   //project: "HSqlDb",
   
   // JSON file with all classnames and widget to store them
@@ -23,14 +23,9 @@ var constants = {
   JSONpath: "/json/",
   JSONext: ".json",
   
-  // test files with JSON data
-  factsFile1: "test/test1",
-  factsFile2: "test/test2",
-  
   // Rascal webserver URL's for openening source files
-  //TODO: revert
-  rascalWebserverInfo: "http://localhost:8080/showLocation?loc=",
-  rascalWebserver: "http://localhost:8080/getInfo?loc=",
+  rascalWebserver: "http://localhost:8080/showLocation?loc=",
+  rascalWebserverInfo: "http://localhost:8080/getInfo?loc=",
   
   // width and height of SVG viewport
   width: 1000,
@@ -401,7 +396,8 @@ function nodeLeave(node) {
 
 function nodeClick() {
   loc = d3.select(this)[0][0].__data__.params.location
-  console.log(loc)
+  loc = loc.slice(1,-1) // remove location pipe character from start and end
+  console.log("Show location in Eclipse: " + loc)
   $.get(constants.rascalWebserver + loc)
 }
 

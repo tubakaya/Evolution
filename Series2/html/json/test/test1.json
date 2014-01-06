@@ -11,7 +11,7 @@
   },
   "children": [
     {
-      "name": "Extra1.1",
+      "name": "Extra",
       "params": {
         "location": "project://TestJ/src/testj/Extra.java",
         "LOC": 89,
@@ -21,7 +21,7 @@
       "children": []
     },
     {
-      "name": "Extra1.2",
+      "name": "Fake1.2",
       "params": {
         "location": "project://TestJ/src/testj/Extra2.java",
         "LOC": 10,
@@ -30,7 +30,7 @@
       },
       "children": [
         {
-          "name": "Extra1.2.1",
+          "name": "Fake1.2.1",
           "params": {
             "location": "project://TestJ/src/testj/Extra.java",
             "LOC": 89,
@@ -42,7 +42,7 @@
       ]
     },
     {
-      "name": "Extra1.3",
+      "name": "Fake1.3",
       "params": {
         "location": "project://TestJ/src/testj/Extra3.java",
         "LOC": 10,
@@ -51,7 +51,7 @@
       },
       "children": [
         {
-          "name": "Extra1.3.1",
+          "name": "Fake1.3.1",
           "params": {
             "location": "project://TestJ/src/testj/Extra4.java",
             "LOC": 10,
@@ -60,7 +60,7 @@
           },
           "children": [
             {
-              "name": "Extra1.3.1.1",
+              "name": "Fake1.3.1.1",
               "params": {
                 "location": "project://TestJ/src/testj/Extra4.java",
                 "LOC": 20,
@@ -70,7 +70,7 @@
               "children": []
             },
             {
-              "name": "Extra1.3.1.2",
+              "name": "Fake1.3.1.2",
               "params": {
                 "location": "project://TestJ/src/testj/Extra4.java",
                 "LOC": 15,
@@ -82,7 +82,7 @@
           ]
         },
         {
-          "name": "Extra1.3.2",
+          "name": "Fake1.3.2",
           "params": {
             "location": "project://TestJ/src/testj/Extra5.java",
             "LOC": 10,

@@ -47,7 +47,8 @@ str getInfo(map[str,str] parameters) {
 
   return
     "\<h1\>Hallo\</h1\>
-    '  Het is \<b\>nu\</b\> <now()>.
+    '  Het is \<b\>nu\</b\> <now()>.\</br\>
+    '  \</br\>
     '  Parameters: \</br\>
     '  <parameters> \</br\>
     '  \</br\>
