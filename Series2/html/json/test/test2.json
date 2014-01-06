@@ -1,0 +1,34 @@
+{
+  "name": "12345678901234567890",
+  "params": {
+    "location": "project://TestJ/src/testj/Main.java",
+    "LOC": 0,
+    "CC": 1,
+    "maxLOC": 1,
+    "minLOC": 1,
+    "maxDepend": 1,
+    "minDepend": 1
+  },
+  "children": [
+    {
+      "name": "1234567890123456789012345678901234567890",
+      "params": {
+        "location": "project://TestJ/src/testj/Extra.java",
+        "LOC": 89,
+        "CC": 5,
+        "dependencyCount": 2
+      },
+      "children": []
+    },
+    {
+      "name": "1234567890123456789012345678901234567890",
+      "params": {
+        "location": "project://TestJ/src/testj/Extra2.java",
+        "LOC": 10,
+        "CC": 5,
+        "dependencyCount": 7
+      },
+      "children": []
+    }
+  ]
+}

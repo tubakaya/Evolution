@@ -9,12 +9,18 @@ var svg = null
 
 // constants used in program
 var constants = {
+  // the Java project for maintenance
+  project: "test",
+  //project: "SmallSql",
+  //project: "HSqlDb",
+  
   // JSON file with all classnames and widget to store them
-  classnamesFile: "/json/SmallSql/classFileNames.json",
+  classnamesFile: "classFileNames",
   widgetClassnames: "#cboClassnames",
 
   // location and information about JSON files
-  JSONpath: "/json/SmallSql/",
+//  JSONpath: "/json/SmallSql/",
+  JSONpath: "/json/",
   JSONext: ".json",
   
   // test files with JSON data
@@ -94,14 +100,17 @@ function initGlobals() {
 }
 
 
-function loadClassnames(filename) {
+function makeJSONfile(filename) {
+  return constants.JSONpath + constants.project + "/" + filename + constants.JSONext
+}
+
+
+function loadClassnames() {
+  filename = makeJSONfile(constants.classnamesFile)
   console.log("loading classnames: " + filename)
   $.getJSON(filename, function(data) {
     console.log("classnames loaded: " + filename)
     $(constants.widgetClassnames).empty()
-    //TODO: remove next 2 lines
-    $(constants.widgetClassnames).append($("<option>", {value: constants.factsFile1}).text(constants.factsFile1))
-    $(constants.widgetClassnames).append($("<option>", {value: constants.factsFile2}).text(constants.factsFile2))
     $.each(data.classes, function(key, value) {
       $(constants.widgetClassnames).append(
         $("<option>", {value: value}).text(value)
@@ -421,7 +430,7 @@ function updateUI() {
 
 // create a tree for given classname and show
 function showGraph(className) {
-  loadFacts(constants.JSONpath + className + constants.JSONext)
+  loadFacts(makeJSONfile(className))
 }
 
 
@@ -444,7 +453,7 @@ function toggleLegend(show) {
 
 
 $(document).ready(function() {
-  loadClassnames(constants.classnamesFile)
+  loadClassnames()
   $(constants.widgetClassnames).combobox()
   $(".custom-combobox-input").focus();
   $("#frmDetails").submit(function(event) {
