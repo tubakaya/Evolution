@@ -1,6 +1,7 @@
 ﻿//TODO:
 //  - show details on hover (complete packagename, LOC, CC, etc)
 //  - change colors and check for colorblindness
+//  - limit the span of the tree
 //  - add slider with number of levels to show
 
 
@@ -43,6 +44,9 @@ var constants = {
   
   // maximum stroke-width for a link between nodes, based on ClassInfo dependency count
   maxStrokeWidth: 30,
+
+  // human readable names for cyclomatic complexity
+  namesCC: ["very low", "low", "moderate", "high", "very high"],
   
   // colors for showing ClassInfo cyclomatic complexity
   // We've choosen an analogous color scheme ranging from 'green' (hue 122)
@@ -53,6 +57,7 @@ var constants = {
   // See: http://goo.gl/aANQ1T
   colorsCC: ["#E55335", "#E59335", "#E5C235", "#C7E535", "#35E53B"],
 
+  // improved colors
   // See: http://goo.gl/f5Z3kq
   colorsCC: ["#F22918", "#FF8AEB", "#00C8F2", "#FFF300", "#18F230"],
   
@@ -200,7 +205,7 @@ function createGraph(treeData) {
     .attr("transform", function(d) {
       return "translate(" + d.y + "," + d.x + ")"
     })
-  newNodes.append("rect")
+  r = newNodes.append("rect")
     .attr('class', 'nodebox')
     .attr("x", getNodeX)
     .attr("y", getNodeY)
@@ -209,6 +214,8 @@ function createGraph(treeData) {
     .attr("rx", 10)
     .attr("ry", 10)
     .style("fill", getFillColor)
+    .append("title")
+      .text(getNodeDetails)
   newNodes.append("text")
     .attr("class", "nodeTitle")
     .attr("y", 0)
@@ -259,12 +266,18 @@ function getNodeTitle(d) {
   return d.name.length > 16 ? d.name.substring(0, 15) + "..." : d.name
 }
 
+function getNodeDetails(d) {
+  return d.name + "\n\n" +
+    getNodeTextLOC(d) + "\n" +
+    getNodeTextCC(d)
+}
+
 function getNodeTextLOC(d) {
   return "LOC: " + d.params.LOC
 }
 
 function getNodeTextCC(d) {
-  return "Complexity: " + d.params.CC
+  return "Complexity: " + d.params.CC + " - " + constants.namesCC[d.params.CC-1]
 }
 
 // get link stroke-width based on ClassInfo dependency count
