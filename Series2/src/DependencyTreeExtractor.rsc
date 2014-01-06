@@ -18,13 +18,14 @@ import FactExtractors::ExtractorCommon;
 import Ranking;
 import Utils;
 
-loc project;
-set[loc] compilationUnits;
+
+map[loc,int] locCC=();
+map[loc,loc] locPhysical=();
+map[loc,map[loc location,int count]] locDepCount = ();
 
 public M3 GetM3Model(loc location)
 {
-	project=location;
-	M3 m3Model =  createM3FromEclipseProject(project);	
+	M3 m3Model =  createM3FromEclipseProject(location);	
 	return m3Model;
 }
 
@@ -38,9 +39,8 @@ public rel[loc from, loc to] GetDependenciesWithinPackages(M3 m3Model)
 	return dependencies;
 }
 
-public set[loc] GetAllClassFiles(M3 m3Model)
-{
-	compilationUnits = files(m3Model@containment);
+public set[loc] GetAllClassFiles(M3 m3Model,set[loc] compilationUnits)
+{	
 	set[loc] allClasses = { c
 							|c <- classes(m3Model)
 							,cu <- compilationUnits
@@ -51,15 +51,14 @@ public set[loc] GetAllClassFiles(M3 m3Model)
 	return allClasses;
 }
 
-public void WriteDependencyTrees(rel[loc from, loc to] dependencies,map[loc location,str fileName] classFileNames)
+public void WriteDependencyTrees(rel[loc from, loc to] dep,map[loc location,str fileName] classFileNames,set[loc] compilationUnits,loc project)
 {
-	rel[loc from, loc to] dep = {d | d<-dependencies, isClass(d.to), InCompilationUnits(d.to)};
 	for(cl <- classFileNames)
 	{
 		loc file = |home:///Desktop/Series2/<classFileNames[cl]>.json|;
 		if(!exists(file))
 		{
-			DependencyTree dependencyTree = GetDependencyTree(cl,dep);
+			DependencyTree dependencyTree = GetDependencyTree(cl,dep,compilationUnits,project);
 			debug("DependencyTree generated.");
 			WriteJsonForClassDependencyTree(classFileNames[cl], dependencyTree);
 			debug("DependencyTree written in json file.");
@@ -84,14 +83,17 @@ public void ExtractClassDependencies(loc location)
 {
 	debug("Started class dependency extraction...");
 	M3 m3Model = GetM3Model(location);
+
 	rel[loc from, loc to] dependencies = GetDependenciesWithinPackages(m3Model);
 	
-	set[loc] allClasses = GetAllClassFiles(m3Model);
+	set[loc] compilationUnits = files(m3Model@containment);
+	set[loc] allClasses = GetAllClassFiles(m3Model,compilationUnits);
 	
 	map[loc location,str fileName] classFileNames=GetClassFileNames(allClasses);
 	WriteClassAndFileNamesToJson(classFileNames);
 	
-	WriteDependencyTrees(dependencies, classFileNames);
+	rel[loc from, loc to] dep = {d | d<-dependencies, isClass(d.to), InCompilationUnits(d.to,compilationUnits)};
+	WriteDependencyTrees(dep, classFileNames,compilationUnits,location);
 }
 
 private set[str] GetAllPackageNames(M3 m3Model)
@@ -116,7 +118,7 @@ private bool InPackages(loc file, set[str] packages)
 }
 
 
-private bool InCompilationUnits(loc file)
+public bool InCompilationUnits(loc file, set[loc] compilationUnits)
 {
 	bool result = false;
 	for(cu <- compilationUnits)
@@ -131,33 +133,44 @@ private bool InCompilationUnits(loc file)
 }
 
 set[loc] visitedClasses;
-private DependencyTree GetDependencyTree(loc class, rel[loc from, loc to] dependencies)
+map[loc, int] childrenLevel;
+
+private DependencyTree GetDependencyTree(loc class, rel[loc from, loc to] dependencies,set[loc] compilationUnits,loc project)
 {
+	childrenLevel = (class:1);
 	debug("\tStarted GetDependencyTree for class <class.path>");
 	visitedClasses = {class};
 
 	map[loc location,int count] depCount= GetDependenciesAndCount(class, dependencies);
 
 	str name=last(split("/",class.path));
-	loc physicalLoc = GetPhysicalLoc(class);
-	int totalLOC=GetLOC(class);	
+	loc physicalLoc = GetPhysicalLoc(class,compilationUnits,project);
+	int totalLOC = GetLOC(class);	
 	
-	return DependencyTree(name,
+	DependencyTree dt=DependencyTree(name,
 						params(
 								physicalLoc
 								,totalLOC
 								,CalculateCC(physicalLoc,totalLOC))
-						,size(depCount)> 0 ?
-							[GetDependencyTreeForChild(d,dependencies,depCount[d])|d<-depCount]
-							: []);
-							
+								,[]);
+	if(size(depCount)> 0)
+	{	
+		for(d<-depCount)
+		{
+			childrenLevel += (d:2);
+		}	
+
+		dt.children=[GetDependencyTreeForChild(d,dependencies,depCount[d],compilationUnits,project)|d<-depCount];
+	}
+	
+	return dt;
 }
 
-private DependencyTree GetDependencyTreeForChild(loc class, rel[loc from, loc to] dependencies, int dependencyCount)
+private DependencyTree GetDependencyTreeForChild(loc class, rel[loc from, loc to] dependencies, int dependencyCount,set[loc] compilationUnits,loc project)
 {
 	debug("\t\tChild class: <class.path>");
 	str name = last(split("/",class.path));
-	loc physicalLoc = GetPhysicalLoc(class);
+	loc physicalLoc = GetPhysicalLoc(class,compilationUnits,project);
 	int totalLOC = GetLOC(class);
 	
 	params parameters = params(physicalLoc
@@ -174,50 +187,92 @@ private DependencyTree GetDependencyTreeForChild(loc class, rel[loc from, loc to
 	visitedClasses += class;
 	
 	map[loc location,int count] depCount= GetDependenciesAndCount(class, dependencies);
-	dt.children = size(depCount) > 0 ?
-							[GetDependencyTreeForChild(d,dependencies,depCount[d])
-								|d<-depCount
-								,d notin visitedClasses]
-							: [];
-							
+	
+	int currentLevel = childrenLevel[class];
+	if(size(depCount) > 0 && currentLevel<5)
+	{				
+		debug("<size(depCount)> children added to level <currentLevel+1>...");	
+		debug("Total size of childrenLevel map is <size(childrenLevel)>");	
+		debug("Class is <class>");
+		debug("Children are:");
+		
+		for(d<-depCount)
+		{
+			childrenLevel += (d:currentLevel+1);
+			debug("<d>");
+		}
+		
+		dt.children = [GetDependencyTreeForChild(d,dependencies,depCount[d],compilationUnits,project)
+					|d<-depCount
+					,d notin visitedClasses];
+	}			
 	return dt;
 }
 
 private map[loc location,int count] GetDependenciesAndCount(loc class, rel[loc from, loc to] dependencies)
 {
-	map[loc location,int count] depCount=();
-	
-	for(r <- dependencies, r.to != class && contains(r.from.path,class.path))
-	{		
-		if(r.to in depCount)
-		{
-			depCount[r.to] += 1;
+	if(class notin locDepCount)
+	{
+		map[loc location,int count] depCount=();
+		
+		for(r <- dependencies, r.to != class && contains(r.from.path,class.path))
+		{		
+			if(r.to in depCount)
+			{
+				depCount[r.to] += 1;
+			}
+			else
+			{
+				depCount += (r.to : 1);
+			}
 		}
-		else
-		{
-			depCount += (r.to : 1);
-		}
+		
+		locDepCount += (class:depCount);
+		return depCount;
 	}
-	return depCount;
+	else
+	{
+		return locDepCount[class];
+	}
 }
 
-private loc GetPhysicalLoc(loc logicalLoc)
+
+private loc GetPhysicalLoc(loc logicalLoc, set[loc]  compilationUnits, loc project)
 {
-	list[loc] cLoc = [project + cu.path |cu <- compilationUnits
-											,last(split("/",cu.path)) == (last(split("/",logicalLoc.path)) + ".java")];
-	
-	if(size(cLoc)<1)
+	if(logicalLoc notin locPhysical)
 	{
-		return logicalLoc;
+		list[loc] cLoc = [project + cu.path |cu <- compilationUnits
+												,last(split("/",cu.path)) == (last(split("/",logicalLoc.path)) + ".java")];
+		
+		if(size(cLoc)<1)
+		{
+			return logicalLoc;
+		}
+		
+		locPhysical += (logicalLoc:cLoc[0]);
+		return cLoc[0];
 	}
-	
-	return cLoc[0];
+	else
+	{
+		return locPhysical[logicalLoc];
+	}
 }
+
 
 private int CalculateCC(loc location, int LOC)
 {
-	ClassFacts cf = ClassFacts(location
+	int CC = 0;
+	if(location notin locCC)
+	{
+		ClassFacts cf = ClassFacts(location
 								,ExtractMethodInfo(location)
 								,LOC);
-	return AnalyzeComplexity(cf);
+		CC = AnalyzeComplexity(cf);
+		locCC += (location:CC);
+		return CC;
+	}
+	else
+	{
+		return locCC[location];
+	}
 }
