@@ -1,5 +1,4 @@
 ﻿//TODO:
-//  - show details on hover (complete packagename, LOC, CC, etc)
 //  - change colors and check for colorblindness
 //  - limit the span of the tree
 //  - add slider with number of levels to show
@@ -205,7 +204,7 @@ function createGraph(treeData) {
     .attr("transform", function(d) {
       return "translate(" + d.y + "," + d.x + ")"
     })
-  r = newNodes.append("rect")
+  newNodes.append("rect")
     .attr('class', 'nodebox')
     .attr("x", getNodeX)
     .attr("y", getNodeY)
@@ -214,8 +213,8 @@ function createGraph(treeData) {
     .attr("rx", 10)
     .attr("ry", 10)
     .style("fill", getFillColor)
-    .append("title")
-      .text(getNodeDetails)
+//    .append("title")
+//      .text(getNodeDetails)
   newNodes.append("text")
     .attr("class", "nodeTitle")
     .attr("y", 0)
@@ -228,27 +227,17 @@ function createGraph(treeData) {
     .attr("fill-opacity", "0.0")
     .text("Open in Eclipse")
     .on("click", nodeClick)
-/*
-  newNodes.append("text")
-    .attr("class", "nodeText textLOC")
-    .attr("y", function(d) {
-      return (getNodeHeight(d) / 2) - 22
-    })
-    .attr("text-anchor", "middle")
-    //.attr("visibility", "visible")
-    //.attr("visibility", "hidden")
-    .text(getNodeTextLOC)
-  newNodes.append("text")
-    .attr("class", "nodeText textCC")
-    .attr("y", function(d) {
-      return (getNodeHeight(d) / 2) - 10
-    })
-    .attr("text-anchor", "middle")
-    .text(getNodeTextCC)
-*/
   newNodes.on("mouseenter", nodeEnter)
   newNodes.on("mouseleave", nodeLeave)
-  //newNodes.on("click", nodeClick)
+
+  // from: http://www.markhansen.co.nz/stolen-vehicles-pt2/
+  $("rect").twipsy({
+    title: function() {
+      return getNodeDetailsHtml(this.__data__)
+    },
+    html: true,
+    placement: "above"
+  });
   
   // update links after all nodes are added
   newLinks.style("stroke-width", getStrokeWidth)
@@ -266,10 +255,17 @@ function getNodeTitle(d) {
   return d.name.length > 16 ? d.name.substring(0, 15) + "..." : d.name
 }
 
+function getNodeDetailsHtml(d) {
+  return d.name + "<br><br>"
+    + getNodeTextLOC(d) + "<br>"
+    + getNodeTextCC(d)
+}
+
+
 function getNodeDetails(d) {
-  return d.name + "\n\n" +
-    getNodeTextLOC(d) + "\n" +
-    getNodeTextCC(d)
+  return d.name + "\n\n"
+    + getNodeTextLOC(d) + "\n"
+    + getNodeTextCC(d)
 }
 
 function getNodeTextLOC(d) {
@@ -475,5 +471,4 @@ $(document).ready(function() {
 	$("#btnLegend").click(function() {
 	  toggleLegend()
 	})
-  //toggleLegend(true)
 })
