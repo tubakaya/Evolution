@@ -10,8 +10,8 @@ var svg = null
 // constants used in program
 var constants = {
   // the Java project for maintenance
-  //project: "test",
-  project: "SmallSql",
+  project: "test",
+  //project: "SmallSql",
   //project: "HSqlDb",
   
   // JSON file with all classnames and widget to store them
@@ -45,7 +45,7 @@ var constants = {
   maxStrokeWidth: 30,
 
   // human readable names for cyclomatic complexity
-  namesCC: ["very low", "low", "moderate", "high", "very high"],
+  namesCC: ["very high", "high", "moderate", "low", "very low"],
   
   // colors for showing ClassInfo cyclomatic complexity
   // We've choosen an analogous color scheme ranging from 'green' (hue 122)
@@ -180,9 +180,10 @@ function createGraph(treeData) {
 */
 
   // remove existing (SVG) graph and create a new one
-  d3.select("svg").remove()
+  d3.select("#svgTree").remove()
   svg = d3.select("#graph")
     .append("svg:svg")
+    .attr("id", "svgTree")
     .attr("width", "100%")
     .attr("height", "100%")
     .attr("viewBox", "0 0 " + constants.width + " " + constants.height)
@@ -293,6 +294,7 @@ function getStrokeWidth(d) {
 // get node color based on ClassInfo Cyclomatic Complexity
 function getFillColor(d) {
   return constants.colorsCC[d.params.CC-1]
+  //return "url(#Triangle)"
 }
 
 // get node growth factor based on ClassInfo LOC
@@ -404,6 +406,7 @@ function nodeLeave(node) {
     .attr("y", 0)
     .attr("fill", constants.colorText)
   showHyperlink(node, false)
+  $(".twipsy").remove()
 }
 
 
