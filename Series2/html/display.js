@@ -10,8 +10,8 @@ var svg = null
 // constants used in program
 var constants = {
   // the Java project for maintenance
-  project: "test",
-  //project: "SmallSql",
+  //project: "test",
+  project: "SmallSql",
   //project: "HSqlDb",
   
   // JSON file with all classnames and widget to store them
@@ -59,7 +59,7 @@ var constants = {
   // improved colors
   // See: http://goo.gl/f5Z3kq
   colorsCC: ["#F22918", "#FF8AEB", "#00C8F2", "#FFF300", "#18F230"],
-  
+
   // colors for elements
   colorLink: "#CCC",      // color for links between nodes
   colorLinkHover: "#888",

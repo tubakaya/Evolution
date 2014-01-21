@@ -1,7 +1,7 @@
 {
   "name": "Main",
   "params": {
-    "location": "project://TestJ/src/testj/Main.java",
+    "location": "|project://TestJ/src/testj/Main.java|",
     "LOC": 32,
     "CC": 1,
     "maxLOC": 89,
@@ -13,7 +13,7 @@
     {
       "name": "Extra",
       "params": {
-        "location": "project://TestJ/src/testj/Extra.java",
+        "location": "|project://TestJ/src/testj/Extra.java|",
         "LOC": 89,
         "CC": 5,
         "dependencyCount": 2
